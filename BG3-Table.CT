@@ -1920,12 +1920,12 @@ bg3.exe+21CE3A6: 48 3B DD        - cmp rbx,rbp
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript Async="1">[ENABLE]
 aobscanmodule(cmdPtr,$process,48 8B 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 41 B0)
-alloc(cmdCode,$1000,cmdPtr)
-alloc(cmdStr0,$1000)
-alloc(cmdStr1,$1000)
-alloc(cmdStr2,$1000)
-alloc(cmdStr3,$1000)
-alloc(cmdStr4,$1000)
+alloc(cmdCode,0x4096,cmdPtr)
+alloc(cmdStr0,0x512)
+alloc(cmdStr1,0x512)
+alloc(cmdStr2,0x512)
+alloc(cmdStr3,0x512)
+alloc(cmdStr4,0x512)
 
 label(cmdList)
 label(cmdCall)
@@ -2074,7 +2074,6 @@ bg3.exe+53DD7C4: E8 17 1A 6B 02           - call bg3.exe+7A8F1E0
             <CheatEntry>
               <ID>357</ID>
               <Description>"Register Commands [2WS]"</Description>
-              <Options moHideChildren="1"/>
               <VariableType>Auto Assembler Script</VariableType>
               <AssemblerScript Async="1">[ENABLE]
 {$lua}
@@ -2101,6 +2100,7 @@ for i = 1, size do
   local self = readPointer(addr + 0x40)
   addr = readPointer(addr + 0x48)
   COMMAND_SELF[name] = self
+  --print("Command: " .. name)
   if addr &gt; 0x1000 then
     unregisterSymbol(name)
     registerSymbol(name, addr, true)
@@ -2121,6 +2121,18 @@ function ExecuteCall(FuncName)
   local cmdSelf = getAddress("cmdSelf")
   local cmdCall = getAddress("cmdCall")
   local cmd = getAddress(FuncName)
+  if cmdAddr == nil then
+     print("ERROR: cmdAddr is nil")
+  end
+  if cmdSelf == nil then
+     print("ERROR: cmdSelf is nil")
+  end
+  if cmdCall == nil then
+     print("ERROR: cmdCall is nil")
+  end
+  if cmd == nil then
+     print("ERROR: cmd is nil")
+  end
   writePointer(cmdAddr, cmd)
   writePointer(cmdSelf, COMMAND_SELF[FuncName])
   return executeCodeEx(0, nil, cmdCall)
@@ -2490,20 +2502,25 @@ function TemplateAddTo(ItemTemplate, InventoryHolder, Count, ShowNotification)
   SetArgToLong(2, Count)
   SetArgToLong(3, ShowNotification)
   ExecuteCall("TemplateAddTo")
+  Sleep(5)
   if type(ItemTemplate) == "table" then
     for i = 1, #ItemTemplate do
       SetArgToString(0, ItemTemplate[i])
       ExecuteCall("TemplateAddTo")
+      Sleep(5)
     end
   else
     SetArgToString(0, ItemTemplate)
     ExecuteCall("TemplateAddTo")
-  end
+    Sleep(5)
+    end
 end
 
 function TemplateAddToPlayer(ItemTemplate, Count)
   local player = GetHostCharacter()
+  Sleep(5)
   TemplateAddTo(ItemTemplate, player, Count, 1)
+  Sleep(5)
 end
 
 function GetPosition(Target)--: X: Y: Z
@@ -3036,112 +3053,142 @@ AddBoostsToPlayer("ActionResource(TidesOfChaos,1,0)")
                       <GroupHeader>1</GroupHeader>
                       <CheatEntries>
                         <CheatEntry>
-                          <ID>4611</ID>
-                          <Description>"Action Point (Inf)"</Description>
+                          <ID>104299</ID>
+                          <Description>"Base Actions (Inf)"</Description>
+                          <Options moManualExpandCollapse="1"/>
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+AddBoostsToPlayer("ActionResourceConsumeMultiplier(ActionPoint,0,0);ActionResourceConsumeMultiplier(BonusActionPoint,0,0);ActionResourceConsumeMultiplier(ReactionActionPoint,0,0)")
+{$asm}
+[DISABLE]
+</AssemblerScript>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>4611</ID>
+                              <Description>"Action Point (Inf)"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
 {$lua}
 if syntaxcheck then return end
 AddBoostsToPlayer("ActionResourceConsumeMultiplier(ActionPoint,0,0)")
 {$asm}
 [DISABLE]
 </AssemblerScript>
-                        </CheatEntry>
-                        <CheatEntry>
-                          <ID>4612</ID>
-                          <Description>"Bonus Action Point (Inf)"</Description>
-                          <VariableType>Auto Assembler Script</VariableType>
-                          <AssemblerScript>[ENABLE]
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>4612</ID>
+                              <Description>"Bonus Action Point (Inf)"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
 {$lua}
 if syntaxcheck then return end
 AddBoostsToPlayer("ActionResourceConsumeMultiplier(BonusActionPoint,0,0)")
 {$asm}
 [DISABLE]
 </AssemblerScript>
-                        </CheatEntry>
-                        <CheatEntry>
-                          <ID>4613</ID>
-                          <Description>"Reaction Point (Inf)"</Description>
-                          <VariableType>Auto Assembler Script</VariableType>
-                          <AssemblerScript>[ENABLE]
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>4613</ID>
+                              <Description>"Reaction Point (Inf)"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
 {$lua}
 if syntaxcheck then return end
 AddBoostsToPlayer("ActionResourceConsumeMultiplier(ReactionActionPoint,0,0)")
 {$asm}
 [DISABLE]
 </AssemblerScript>
+                            </CheatEntry>
+                          </CheatEntries>
                         </CheatEntry>
                         <CheatEntry>
                           <ID>4614</ID>
-                          <Description>"Spell Slot (Level 1) (Inf)"</Description>
+                          <Description>"Spell Slot (Level 1-6) (Inf)"</Description>
+                          <Options moManualExpandCollapse="1"/>
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+AddBoostsToPlayer("ActionResourceConsumeMultiplier(SpellSlot,0,1);ActionResourceConsumeMultiplier(SpellSlot,0,2);ActionResourceConsumeMultiplier(SpellSlot,0,3);ActionResourceConsumeMultiplier(SpellSlot,0,4);ActionResourceConsumeMultiplier(SpellSlot,0,5);ActionResourceConsumeMultiplier(SpellSlot,0,6)")
+{$asm}
+[DISABLE]
+</AssemblerScript>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>104300</ID>
+                              <Description>"Spell Slot (Level 1) (Inf)"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
 {$lua}
 if syntaxcheck then return end
 AddBoostsToPlayer("ActionResourceConsumeMultiplier(SpellSlot,0,1)")
 {$asm}
 [DISABLE]
 </AssemblerScript>
-                        </CheatEntry>
-                        <CheatEntry>
-                          <ID>4615</ID>
-                          <Description>"Spell Slot (Level 2) (Inf)"</Description>
-                          <VariableType>Auto Assembler Script</VariableType>
-                          <AssemblerScript>[ENABLE]
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>4615</ID>
+                              <Description>"Spell Slot (Level 2) (Inf)"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
 {$lua}
 if syntaxcheck then return end
 AddBoostsToPlayer("ActionResourceConsumeMultiplier(SpellSlot,0,2)")
 {$asm}
 [DISABLE]
 </AssemblerScript>
-                        </CheatEntry>
-                        <CheatEntry>
-                          <ID>4616</ID>
-                          <Description>"Spell Slot (Level 3) (Inf)"</Description>
-                          <VariableType>Auto Assembler Script</VariableType>
-                          <AssemblerScript>[ENABLE]
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>4616</ID>
+                              <Description>"Spell Slot (Level 3) (Inf)"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
 {$lua}
 if syntaxcheck then return end
 AddBoostsToPlayer("ActionResourceConsumeMultiplier(SpellSlot,0,3)")
 {$asm}
 [DISABLE]
 </AssemblerScript>
-                        </CheatEntry>
-                        <CheatEntry>
-                          <ID>4617</ID>
-                          <Description>"Spell Slot (Level 4) (Inf)"</Description>
-                          <VariableType>Auto Assembler Script</VariableType>
-                          <AssemblerScript>[ENABLE]
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>4617</ID>
+                              <Description>"Spell Slot (Level 4) (Inf)"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
 {$lua}
 if syntaxcheck then return end
 AddBoostsToPlayer("ActionResourceConsumeMultiplier(SpellSlot,0,4)")
 {$asm}
 [DISABLE]
 </AssemblerScript>
-                        </CheatEntry>
-                        <CheatEntry>
-                          <ID>4618</ID>
-                          <Description>"Spell Slot (Level 5) (Inf)"</Description>
-                          <VariableType>Auto Assembler Script</VariableType>
-                          <AssemblerScript>[ENABLE]
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>4618</ID>
+                              <Description>"Spell Slot (Level 5) (Inf)"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
 {$lua}
 if syntaxcheck then return end
 AddBoostsToPlayer("ActionResourceConsumeMultiplier(SpellSlot,0,5)")
 {$asm}
 [DISABLE]
 </AssemblerScript>
-                        </CheatEntry>
-                        <CheatEntry>
-                          <ID>4619</ID>
-                          <Description>"Spell Slot (Level 6) (Inf)"</Description>
-                          <VariableType>Auto Assembler Script</VariableType>
-                          <AssemblerScript>[ENABLE]
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>4619</ID>
+                              <Description>"Spell Slot (Level 6) (Inf)"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
 {$lua}
 if syntaxcheck then return end
 AddBoostsToPlayer("ActionResourceConsumeMultiplier(SpellSlot,0,6)")
 {$asm}
 [DISABLE]
 </AssemblerScript>
+                            </CheatEntry>
+                          </CheatEntries>
                         </CheatEntry>
                         <CheatEntry>
                           <ID>4620</ID>
@@ -3169,63 +3216,78 @@ AddBoostsToPlayer("ActionResourceConsumeMultiplier(ArcaneRecoveryPoint,0,0)")
                         </CheatEntry>
                         <CheatEntry>
                           <ID>4622</ID>
-                          <Description>"Warlock Spell Slot (Level 1) (Inf)"</Description>
+                          <Description>"Warlock Spell Slot (Level 1-5) (Inf)"</Description>
+                          <Options moManualExpandCollapse="1"/>
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+AddBoostsToPlayer("ActionResourceConsumeMultiplier(WarlockSpellSlot,0,1);ActionResourceConsumeMultiplier(WarlockSpellSlot,0,2);ActionResourceConsumeMultiplier(WarlockSpellSlot,0,3);ActionResourceConsumeMultiplier(WarlockSpellSlot,0,4);ActionResourceConsumeMultiplier(WarlockSpellSlot,0,5)")
+{$asm}
+[DISABLE]
+</AssemblerScript>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>104301</ID>
+                              <Description>"Warlock Spell Slot (Level 1) (Inf)"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
 {$lua}
 if syntaxcheck then return end
 AddBoostsToPlayer("ActionResourceConsumeMultiplier(WarlockSpellSlot,0,1)")
 {$asm}
 [DISABLE]
 </AssemblerScript>
-                        </CheatEntry>
-                        <CheatEntry>
-                          <ID>4623</ID>
-                          <Description>"Warlock Spell Slot (Level 2) (Inf)"</Description>
-                          <VariableType>Auto Assembler Script</VariableType>
-                          <AssemblerScript>[ENABLE]
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>4623</ID>
+                              <Description>"Warlock Spell Slot (Level 2) (Inf)"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
 {$lua}
 if syntaxcheck then return end
 AddBoostsToPlayer("ActionResourceConsumeMultiplier(WarlockSpellSlot,0,2)")
 {$asm}
 [DISABLE]
 </AssemblerScript>
-                        </CheatEntry>
-                        <CheatEntry>
-                          <ID>4624</ID>
-                          <Description>"Warlock Spell Slot (Level 3) (Inf)"</Description>
-                          <VariableType>Auto Assembler Script</VariableType>
-                          <AssemblerScript>[ENABLE]
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>4624</ID>
+                              <Description>"Warlock Spell Slot (Level 3) (Inf)"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
 {$lua}
 if syntaxcheck then return end
 AddBoostsToPlayer("ActionResourceConsumeMultiplier(WarlockSpellSlot,0,3)")
 {$asm}
 [DISABLE]
 </AssemblerScript>
-                        </CheatEntry>
-                        <CheatEntry>
-                          <ID>4625</ID>
-                          <Description>"Warlock Spell Slot (Level 4) (Inf)"</Description>
-                          <VariableType>Auto Assembler Script</VariableType>
-                          <AssemblerScript>[ENABLE]
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>4625</ID>
+                              <Description>"Warlock Spell Slot (Level 4) (Inf)"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
 {$lua}
 if syntaxcheck then return end
 AddBoostsToPlayer("ActionResourceConsumeMultiplier(WarlockSpellSlot,0,4)")
 {$asm}
 [DISABLE]
 </AssemblerScript>
-                        </CheatEntry>
-                        <CheatEntry>
-                          <ID>4626</ID>
-                          <Description>"Warlock Spell Slot (Level 5) (Inf)"</Description>
-                          <VariableType>Auto Assembler Script</VariableType>
-                          <AssemblerScript>[ENABLE]
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>4626</ID>
+                              <Description>"Warlock Spell Slot (Level 5) (Inf)"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
 {$lua}
 if syntaxcheck then return end
 AddBoostsToPlayer("ActionResourceConsumeMultiplier(WarlockSpellSlot,0,5)")
 {$asm}
 [DISABLE]
 </AssemblerScript>
+                            </CheatEntry>
+                          </CheatEntries>
                         </CheatEntry>
                         <CheatEntry>
                           <ID>4627</ID>
@@ -3509,6 +3571,11 @@ RemoveStatusFromPlayer(status)
 </AssemblerScript>
                         </CheatEntry>
                       </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>104298</ID>
+                      <Description>"Unlimited Per Class"</Description>
+                      <GroupHeader>1</GroupHeader>
                     </CheatEntry>
                   </CheatEntries>
                 </CheatEntry>
@@ -3917,17 +3984,6 @@ AddBoostsToPlayer("ActionResourceConsumeMultiplier(Movement,0,0)")
 </AssemblerScript>
                     </CheatEntry>
                     <CheatEntry>
-                      <ID>4652</ID>
-                      <Description>"Extra Movement"</Description>
-                      <VariableType>Auto Assembler Script</VariableType>
-                      <AssemblerScript>{$lua}
-if syntaxcheck then return end
-[ENABLE]
-AddBoostsToPlayer("ActionResourceMultiplier(Movement,2000,0)")
-[DISABLE]
-</AssemblerScript>
-                    </CheatEntry>
-                    <CheatEntry>
                       <ID>4653</ID>
                       <Description>"Increase Carry Capacity"</Description>
                       <VariableType>Auto Assembler Script</VariableType>
@@ -3935,6 +3991,39 @@ AddBoostsToPlayer("ActionResourceMultiplier(Movement,2000,0)")
 if syntaxcheck then return end
 [ENABLE]
 AddBoostsToPlayer("CarryCapacityMultiplier(1000)")
+[DISABLE]
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>104297</ID>
+                      <Description>"Extra Movement +100"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+AddBoostsToPlayer("ActionResourceMultiplier(Movement,100,0)")
+[DISABLE]
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>104296</ID>
+                      <Description>"Extra Movement +500"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+AddBoostsToPlayer("ActionResourceMultiplier(Movement,500,0)")
+[DISABLE]
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>4652</ID>
+                      <Description>"Extra Movement +2000"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+AddBoostsToPlayer("ActionResourceMultiplier(Movement,2000,0)")
 [DISABLE]
 </AssemblerScript>
                     </CheatEntry>
@@ -26443,16 +26532,1417 @@ AddPassiveToPlayer(passive)
                   </CheatEntries>
                 </CheatEntry>
                 <CheatEntry>
+                  <ID>104249</ID>
+                  <Description>"Combat Passives"</Description>
+                  <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>104250</ID>
+                      <Description>"Healing Passives"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>104251</ID>
+                          <Description>"Drink Blood from Surfaces"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "LOW_Cazador_SpawnBuff_Astarion_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104252</ID>
+                          <Description>"Heal On Melee Attack"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "LOW_Sarevok_Essence_Amelyssan"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104253</ID>
+                          <Description>"Maximize Healing"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_PHB_PeriaptofWoundClosure_Amulet_Maximize_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>104254</ID>
+                      <Description>"Critical Hit Passives"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>104255</ID>
+                          <Description>"Improved Critical Hit"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "ImprovedCritical"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104256</ID>
+                          <Description>"Reduce Critical Attack Threshold"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_WYR_Orin_Bhaalist_Dagger_ImprovedCritical_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104257</ID>
+                          <Description>"Reduce Critical Attack Threshold"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_TheClover_Rearrangement_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104258</ID>
+                          <Description>"Reduce Critical Attack Threshold"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_Sarevok_HornedHelmet_DeathbringerSight_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104259</ID>
+                          <Description>"Reduce Critical Attack Threshold"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_TheDueller_ImprovedDuelist_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104260</ID>
+                          <Description>"Covert Critical (While Obscured)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_Shadow_CriticalBoostWhileObscured_Helmet_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104261</ID>
+                          <Description>"Skilled Skullduggery (While Stealthed)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_Critical_Hiding_ReduceCriticalRange_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104262</ID>
+                          <Description>"Always Crit When Below 40% Hitpoints"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "Scar_Fury_Gur"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>104263</ID>
+                      <Description>"Combat Passives"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>104264</ID>
+                          <Description>"Automatically Revive When Downed"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_LowHP_1HP_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104265</ID>
+                          <Description>"Evade Area Damage"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "Evasion"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104266</ID>
+                          <Description>"Improved Bardic Inspiration (+1 Attack Roll)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "SCE_TieflingFollowup_BardicInspiration_Attack_Ability"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104267</ID>
+                          <Description>"Unnatural Growth (+1 Action Point)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "LOW_GithProdigy_UnnaturalGrowth"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104268</ID>
+                          <Description>"Cold Damage Creates Ice Surface"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_Frost_GenerateSurfaceOnColdDamage_Ring_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104269</ID>
+                          <Description>"Disengage Drops Fog Cloud"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_Shadow_FogOfCloudDisengage_Cloak_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104270</ID>
+                          <Description>"Difficult Terrain Immunity"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_TerrainWalker_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104271</ID>
+                          <Description>"Bloodfeeder (On Kill)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_Zhentarim_BloodfeederBlade_Rapier_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104272</ID>
+                          <Description>"Invisibility On Kill"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "UNI_DarkUrge_Stealth_Expertise_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104273</ID>
+                          <Description>"Aura of Murder Passive"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_Bhaalist_Aura_Of_Murder_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104274</ID>
+                          <Description>"Ranged Attack Roll Bonus"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_Marksmanship_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104275</ID>
+                          <Description>"Increased Initiative"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = {
+"ARM_Ambusher_1_Passive", -- Initiative(1)
+"ARM_Ambusher_2_Passive", -- Initiative(2)
+"FeralInstinct", -- Initiative(3);StatusImmunity(SURPRISED)
+"MAG_PHB_ElvenChain_AddedEffect_Armor_Passive", -- Initiative(2);Advantage(SavingThrow, Dexterity)
+"MAG_PHB_Sentinel_Shield_Passive", -- Initiative(3);Advantage(Skill, Perception)
+"MAG_Bhalist_Hat_Passive", -- Initiative(2);DarkvisionRange(3)
+"MAG_InitiativeBonus_1_Passive", -- Initiative(1)
+"MAG_InitiativeBonus_2_Passive", -- Initiative(2)
+"MAG_InitiativeWeapon_Passive" -- Initiative(1);Advantage(Skill, Perception)
+}
+[ENABLE]
+AddPassiveToPlayer(passive)
+[DISABLE]
+RemovePassiveFromPlayer(passive)
+</AssemblerScript>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>104276</ID>
+                      <Description>"Attack Passives"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>104277</ID>
+                          <Description>"Infernal Acuity (+1 Attack Roll)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_Infernal_Metal_AttackBonus_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104278</ID>
+                          <Description>"+2 Attack Roll; +2 Damage"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_AttackDamage_Bonus_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104279</ID>
+                          <Description>"+2 Attack Roll"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_Monk_Martial_Lethality_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104280</ID>
+                          <Description>"+1 Attack Roll"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_OfSwordmaster_Gloves_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104281</ID>
+                          <Description>"+2 Attack Roll When Hurt"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_Barbarian_Hide_Helmet_Bloodseeker_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104282</ID>
+                          <Description>"+1D4 Attack Roll (When Hurt)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_TheWoundSeeker_Greatsword_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104283</ID>
+                          <Description>"Advantage Against Wet Targets (...that's what she said)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_LC_Umberlee_Cold_Sickle_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104284</ID>
+                          <Description>"Attacks Gain Knockback"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "LOW_Chasm_Mangle_Pushback"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104285</ID>
+                          <Description>"Tippler's Rage"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_TWN_Brewer_DrunkardRage_Explosion_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104286</ID>
+                          <Description>"Ignore Physical Resistances"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_Barbarian_Gloves_BoneSpike_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>104287</ID>
+                      <Description>"Ranged Attack Passives"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>104288</ID>
+                          <Description>"Double Ranged Proficiency Bonus"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_DoubleProficiencyBonusToRangedAttack_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104289</ID>
+                          <Description>"Ranged Attacks Apply Bane"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_BG_Harold_HeavyCrossbow_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104290</ID>
+                          <Description>"Ranged Attacks Turn Undead"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_WeaponAction_UndeadTurning_Ammunition_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104291</ID>
+                          <Description>"Darkveil Precision (+1D4 Ranged Attack Rolls While Obscured)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_Shadow_Blinding_Bow_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>104292</ID>
+                      <Description>"Throw Weapon Passives"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>104293</ID>
+                          <Description>"Dagger Thrower (+8 Throw Damage)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "LOW_Guildhall_DaggerThrower"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104294</ID>
+                          <Description>"Kushigo's Might (+1D4 Throw Damage)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_Monk_Magic_Gloves_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104295</ID>
+                          <Description>"Throwing Boost (+1D4 Throw Damage)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_Harpers_RingOfProjection_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>104220</ID>
+                  <Description>"Spell Cheats"</Description>
+                  <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>104221</ID>
+                      <Description>"Passives"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>104222</ID>
+                          <Description>"Free Cast Level 1 Spells (Can Still Upcast)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_FreeCast_Level3_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104223</ID>
+                          <Description>"Daredevil Proximity (Melee Spells)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_ClosQuarterRangedSpell_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104224</ID>
+                          <Description>"Increase Damage on Elemental Cantrips"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_ElementalGish_CantripBooster_Amulet_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104225</ID>
+                          <Description>"Concentration Advantage"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_Multitasking_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104226</ID>
+                          <Description>"Cantrip Damage Adds Charisma Modifier"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_CharismaCaster_CantripBooster_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104227</ID>
+                          <Description>"+3 Spell Attack Roll"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_Legendary_ArcaneEnchantment_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104228</ID>
+                          <Description>"+2 Spell Attack Roll"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_ArcaneEnchantment_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104229</ID>
+                          <Description>"+1 Spell Attack Roll"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_CQCaster_CloseRangedSpellMastery_Gloves_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104230</ID>
+                          <Description>"+1 Spell Attack Roll"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_ArcaneEnchantment_Lesser_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104231</ID>
+                          <Description>"+2 Spell Save DC"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_SpellSaveDC_Enchantment_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104232</ID>
+                          <Description>"+1 Spell Save DC"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_SpellSaveDC_Enchantment_Lesser_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104233</ID>
+                          <Description>"Sorcery Amulet"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_OfGreaterSorcery_Amulet_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104234</ID>
+                          <Description>"Arcane Trickster Ring"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_ArcaneTrickster_Ring_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104235</ID>
+                          <Description>"Consume Life Essence Passive"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_GreaterNecromancyStaff_CosumeLifeEssence_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104236</ID>
+                          <Description>"Mage Hand Uses Bonus Action"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_Githborn_MageHandSupport_Gloves_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>104237</ID>
+                      <Description>"Resource Passives"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>104238</ID>
+                          <Description>"+1 Level 1 Spell Slot"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_AdditionalSpellSlot_Level1_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104239</ID>
+                          <Description>"+1 Level 1 Spell Slot (after long rest)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_ShieldOfDevotion_Cooldown_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104240</ID>
+                          <Description>"+1 Level 1 Spell Slot (after long rest)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_DeathKnightShield_Cooldown_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104241</ID>
+                          <Description>"+1 Level 2 Spell Slot"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_AdditionalSpellSlot_Level2_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104242</ID>
+                          <Description>"+1 Level 2 Spell Slot (after long rest)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_LC_TheAmplifier_Amulet_Cooldown_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104243</ID>
+                          <Description>"+1 Level 3 Spell Slot"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_AdditionalSpellSlot_Level3_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104244</ID>
+                          <Description>"+2 Sorcery Points"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_ExtraSorcery_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104245</ID>
+                          <Description>"+1 Sorcery Point (after long rest)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_OfGreaterSorcery_Amulet_Cooldown_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104246</ID>
+                          <Description>"+1 Channel Divinity"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_OfTheDevout_Amulet_Cooldown_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104247</ID>
+                          <Description>"+1 Wildshape"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_Druid_ExtraWildShape_Cooldown_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104248</ID>
+                          <Description>"+1 Bardic Inspiration"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_WondrousGloves_Cooldown_Passive"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
                   <ID>4684</ID>
                   <Description>"Dice Roll Cheats"</Description>
                   <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
                   <GroupHeader>1</GroupHeader>
                   <CheatEntries>
                     <CheatEntry>
-                      <ID>4685</ID>
-                      <Description>"Add Bardic Inspiration [2WS]"</Description>
-                      <VariableType>Auto Assembler Script</VariableType>
-                      <AssemblerScript>{$lua}
+                      <ID>104206</ID>
+                      <Description>"Passive"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>104208</ID>
+                          <Description>"Dark One's Own Luck"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "DarkOnesOwnLuck"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104209</ID>
+                          <Description>"Reliable Talent"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "ReliableTalent"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104210</ID>
+                          <Description>"Tactical Discipline"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "Tactical_Discipline"
+[ENABLE]
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104211</ID>
+                          <Description>"Bardic Inspirations"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
 if syntaxcheck then return end
 passive = {
 "BardicInspiration_Ability",
@@ -26465,45 +27955,72 @@ AddPassiveToPlayer(passive)
 [DISABLE]
 RemovePassiveFromPlayer(passive)
 </AssemblerScript>
-                    </CheatEntry>
-                    <CheatEntry>
-                      <ID>4686</ID>
-                      <Description>"Roll Always Critical Success"</Description>
-                      <VariableType>Auto Assembler Script</VariableType>
-                      <AssemblerScript>{$lua}
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104212</ID>
+                          <Description>"Balance / Body Aim / Elegant / Stealthy (Magic Armor)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
 if syntaxcheck then return end
+passive = {
+"ARM_Elegant_1_Passive", -- RollBonus(SavingThrow,1,Charisma); RollBonus(RawAbility,1,Charisma)
+"ARM_Elegant_2_Passive", -- RollBonus(SavingThrow,2,Charisma); RollBonus(RawAbility,2,Charisma)
+"ARM_Balance_1_Passive", -- RollBonus(SavingThrow,1,Dexterity);RollBonus(RawAbility,1,Dexterity)
+"ARM_Balance_2_Passive", -- RollBonus(SavingThrow,2,Dexterity);RollBonus(RawAbility,2,Dexterity)
+"ARM_BodyAid_1_Passive", -- RollBonus(SavingThrow,1,Strength); RollBonus(RawAbility,1,Strength)
+"ARM_BodyAid_2_Passive", -- RollBonus(SavingThrow,2,Strength); RollBonus(RawAbility,2,Strength)
+"ARM_Stealthy_1_Passive",-- RollBonus(SkillCheck, 1,Stealth)
+"ARM_Stealthy_2_Passive" -- RollBonus(SkillCheck, 2,Stealth)
+}
 [ENABLE]
-AddBoostsToPlayer("MinimumRollResult(RawAbility,20);MinimumRollResult(SkillCheck,20);MinimumRollResult(SavingThrow,20)")
+AddPassiveToPlayer(passive)
 [DISABLE]
+RemovePassiveFromPlayer(passive)
 </AssemblerScript>
-                    </CheatEntry>
-                    <CheatEntry>
-                      <ID>4778</ID>
-                      <Description>"Roll Always 19/20"</Description>
-                      <VariableType>Auto Assembler Script</VariableType>
-                      <AssemblerScript>{$lua}
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104213</ID>
+                          <Description>"Advantage on Saving Throws"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
 if syntaxcheck then return end
+passive = "LOW_Cazador_SpawnBuff_002_Passive"
 [ENABLE]
-AddBoostsToPlayer("MinimumRollResult(RawAbility,19);MinimumRollResult(SkillCheck,19);MinimumRollResult(SavingThrow,19)")
+local result = AddPassiveToPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
 [DISABLE]
+local result = RemovePassiveFromPlayer(passive)
+if result ~= 1 then
+  print("command failed")
+end
 </AssemblerScript>
+                        </CheatEntry>
+                      </CheatEntries>
                     </CheatEntry>
                     <CheatEntry>
-                      <ID>4687</ID>
-                      <Description>"Add Saving Throw Proficiency Bonus"</Description>
-                      <VariableType>Auto Assembler Script</VariableType>
-                      <AssemblerScript>{$lua}
+                      <ID>104207</ID>
+                      <Description>"Boost"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>104215</ID>
+                          <Description>"Add Saving Throw Proficiency Bonus"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
 if syntaxcheck then return end
 [ENABLE]
 AddBoostsToPlayer("ProficiencyBonus(SavingThrow,Strength);ProficiencyBonus(SavingThrow,Dexterity);ProficiencyBonus(SavingThrow,Constitution);ProficiencyBonus(SavingThrow,Intelligence);ProficiencyBonus(SavingThrow,Wisdom);ProficiencyBonus(SavingThrow,Charisma)")
 [DISABLE]
 </AssemblerScript>
-                    </CheatEntry>
-                    <CheatEntry>
-                      <ID>4688</ID>
-                      <Description>"Add Skill Proficiency, Expertise, and Advantage"</Description>
-                      <VariableType>Auto Assembler Script</VariableType>
-                      <AssemblerScript>{$lua}
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104216</ID>
+                          <Description>"Add Skill Proficiency, Expertise, and Advantage"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
 if syntaxcheck then return end
 [ENABLE]
 local skills = {
@@ -26558,54 +28075,54 @@ end
 AddBoostsToPlayer(skills)
 [DISABLE]
 </AssemblerScript>
-                    </CheatEntry>
-                    <CheatEntry>
-                      <ID>104180</ID>
-                      <Description>"Add Proficiency"</Description>
-                      <Options moHideChildren="1"/>
-                      <GroupHeader>1</GroupHeader>
-                      <CheatEntries>
+                        </CheatEntry>
                         <CheatEntry>
-                          <ID>4689</ID>
-                          <Description>"Add Light Armor"</Description>
-                          <VariableType>Auto Assembler Script</VariableType>
-                          <AssemblerScript>{$lua}
+                          <ID>104180</ID>
+                          <Description>"Add Proficiency"</Description>
+                          <Options moHideChildren="1"/>
+                          <GroupHeader>1</GroupHeader>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>4689</ID>
+                              <Description>"Add Light Armor"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>{$lua}
 if syntaxcheck then return end
 [ENABLE]
 local boost = "Proficiency(LightArmor)"
 AddBoostsToPlayer(boost)
 [DISABLE]
 </AssemblerScript>
-                        </CheatEntry>
-                        <CheatEntry>
-                          <ID>104182</ID>
-                          <Description>"Add Medium Armor"</Description>
-                          <VariableType>Auto Assembler Script</VariableType>
-                          <AssemblerScript>{$lua}
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>104182</ID>
+                              <Description>"Add Medium Armor"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>{$lua}
 if syntaxcheck then return end
 [ENABLE]
 local boost = "Proficiency(MediumArmor)"
 AddBoostsToPlayer(boost)
 [DISABLE]
 </AssemblerScript>
-                        </CheatEntry>
-                        <CheatEntry>
-                          <ID>104181</ID>
-                          <Description>"Add Heavy Armor"</Description>
-                          <VariableType>Auto Assembler Script</VariableType>
-                          <AssemblerScript>{$lua}
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>104181</ID>
+                              <Description>"Add Heavy Armor"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>{$lua}
 if syntaxcheck then return end
 [ENABLE]
 local boost = "Proficiency(HeavyArmor)"
 AddBoostsToPlayer(boost)
 [DISABLE]
 </AssemblerScript>
-                        </CheatEntry>
-                        <CheatEntry>
-                          <ID>104183</ID>
-                          <Description>"Add Musical Instrument"</Description>
-                          <VariableType>Auto Assembler Script</VariableType>
-                          <AssemblerScript>{$lua}
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>104183</ID>
+                              <Description>"Add Musical Instrument"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>{$lua}
 if syntaxcheck then return end
 [ENABLE]
 
@@ -26613,28 +28130,52 @@ local boost = "Proficiency(MusicalInstrument)"
 AddBoostsToPlayer(boost)
 [DISABLE]
 </AssemblerScript>
+                            </CheatEntry>
+                          </CheatEntries>
                         </CheatEntry>
-                      </CheatEntries>
-                    </CheatEntry>
-                    <CheatEntry>
-                      <ID>4690</ID>
-                      <Description>"Add Advantage"</Description>
-                      <VariableType>Auto Assembler Script</VariableType>
-                      <AssemblerScript>{$lua}
+                        <CheatEntry>
+                          <ID>104218</ID>
+                          <Description>"Add Advantage"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
 if syntaxcheck then return end
 [ENABLE]
 AddBoostsToPlayer("Advantage(AllSavingThrows);Advantage(AllAbilities);Advantage(AttackRoll)")
 [DISABLE]
 </AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104219</ID>
+                          <Description>"Add Roll Bonus"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+AddBoostsToPlayer("RollBonus(SkillCheck,50);RollBonus(RawAbility,50);RollBonus(SavingThrow,50)")
+[DISABLE]
+</AssemblerScript>
+                        </CheatEntry>
+                      </CheatEntries>
                     </CheatEntry>
                     <CheatEntry>
-                      <ID>4691</ID>
-                      <Description>"Add Roll Bonus"</Description>
+                      <ID>4686</ID>
+                      <Description>"Roll Always Critical Success"</Description>
                       <VariableType>Auto Assembler Script</VariableType>
                       <AssemblerScript>{$lua}
 if syntaxcheck then return end
 [ENABLE]
-AddBoostsToPlayer("RollBonus(SkillCheck,50);RollBonus(RawAbility,50);RollBonus(SavingThrow,50)")
+AddBoostsToPlayer("MinimumRollResult(RawAbility,20);MinimumRollResult(SkillCheck,20);MinimumRollResult(SavingThrow,20)")
+[DISABLE]
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>4778</ID>
+                      <Description>"Roll Always 19/20"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+AddBoostsToPlayer("MinimumRollResult(RawAbility,19);MinimumRollResult(SkillCheck,19);MinimumRollResult(SavingThrow,19)")
 [DISABLE]
 </AssemblerScript>
                     </CheatEntry>
@@ -27985,7 +29526,7 @@ AddBoostsToPlayer("Ability(Strength,31,20);Ability(Dexterity,31,20);Ability(Cons
                     </CheatEntry>
                     <CheatEntry>
                       <ID>4701</ID>
-                      <Description>"Toggle Fog of War"</Description>
+                      <Description>"Toggle Fog of War [2WS]"</Description>
                       <VariableType>Auto Assembler Script</VariableType>
                       <AssemblerScript>{$lua}
 if syntaxcheck then return end
@@ -27999,13 +29540,14 @@ ExecuteCall("ShroudRender")
                     </CheatEntry>
                     <CheatEntry>
                       <ID>4702</ID>
-                      <Description>"God Mode"</Description>
+                      <Description>"God Mode [2WS]"</Description>
                       <VariableType>Auto Assembler Script</VariableType>
                       <AssemblerScript>{$lua}
 if syntaxcheck then return end
 [ENABLE]
 AddBoostsToPlayer("DamageReduction(All, Flat, 100)")
 [DISABLE]
+RemoveBoostsFromPlayer("DamageReduction(All, Flat, 100)")
 </AssemblerScript>
                     </CheatEntry>
                   </CheatEntries>
@@ -28404,6 +29946,19 @@ RemoveStatusFromPlayer(status)
 </AssemblerScript>
                     </CheatEntry>
                     <CheatEntry>
+                      <ID>104200</ID>
+                      <Description>"Enlarge [2WS]"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>{$lua}
+if syntaxcheck then return end
+status = "ENLARGE"
+[ENABLE]
+ApplyStatusToPlayer(status, -1)
+[DISABLE]
+RemoveStatusFromPlayer(status)
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
                       <ID>4736</ID>
                       <Description>"Shrink [2WS]"</Description>
                       <VariableType>Auto Assembler Script</VariableType>
@@ -28431,20 +29986,6 @@ RemoveStatusFromPlayer(status)
                       <GroupHeader>1</GroupHeader>
                     </CheatEntry>
                     <CheatEntry>
-                      <ID>360</ID>
-                      <Description>"UNI_TWN_Distillery_PurpleWormGlands_DO_NOT_USE"</Description>
-                      <VariableType>Auto Assembler Script</VariableType>
-                      <AssemblerScript>{$lua}
-if syntaxcheck then return end
-[ENABLE]
-local item = {
- "995350b8-1f00-407f-bece-a8452945da66",
-}
-TemplateAddToPlayer(item, 1)
-[DISABLE]
-</AssemblerScript>
-                    </CheatEntry>
-                    <CheatEntry>
                       <ID>5537</ID>
                       <Description>"(Sample Script) -&gt; Spawn Hand Crossbow +2 "</Description>
                       <VariableType>Auto Assembler Script</VariableType>
@@ -28457,6 +29998,53 @@ local item = {
 TemplateAddToPlayer(item, 1)
 [DISABLE]
 </AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>104202</ID>
+                      <Description>"Other"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>360</ID>
+                          <Description>"OBJ_Oil_Of_The_Basilisk"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local item = {
+ "212ca846-4766-4370-8847-454e59751598",
+}
+TemplateAddToPlayer(item, 5)
+[DISABLE]
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104329</ID>
+                          <Description>"UNI_TWN_Distillery_PurpleWormGlands_DO_NOT_USE"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local item = {
+ "995350b8-1f00-407f-bece-a8452945da66",
+}
+TemplateAddToPlayer(item, 1)
+[DISABLE]
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104201</ID>
+                          <Description>"Spawn Gale's Death Pouch"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+TemplateAddToPlayer("7ee02bb4-79a0-41d5-9f0a-7feae2e6561a", 1)
+[DISABLE]
+</AssemblerScript>
+                        </CheatEntry>
+                      </CheatEntries>
                     </CheatEntry>
                     <CheatEntry>
                       <ID>1042</ID>
@@ -46837,55 +48425,951 @@ TemplateAddToPlayer(items, 1)
                     </CheatEntry>
                     <CheatEntry>
                       <ID>399</ID>
-                      <Description>"1. Select Main Character and Activate This Script"</Description>
+                      <Description>"Companion Cheats (disabling will reset fields) [2WS]"</Description>
+                      <Options moHideChildren="1"/>
                       <VariableType>Auto Assembler Script</VariableType>
-                      <AssemblerScript Async="1">{$lua}
+                      <AssemblerScript Async="1">[ENABLE]
+{$asm}
+alloc(m_MainCharacter,0x512)
+registersymbol(m_MainCharacter)
+
+m_MainCharacter:
+ dq "empty"
+
+
+[DISABLE]
+unregistersymbol(m_MainCharacter)
+dealloc(m_MainCharacter)
+</AssemblerScript>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>104302</ID>
+                          <Description>"0. Select your character [2WS]"</Description>
+                          <Options moHideChildren="1"/>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript Async="1">[ENABLE]
+{$lua}
+COMPANION = {}
+COMPANION["shadowheart"] = "3ed74f06-3c60-42dc-83f6-f034cb47c679" -- shadowheart
+COMPANION["gale"] = "ad9af97d-75da-406a-ae13-7071c563f604" -- gale
+COMPANION["minthara"] = "25721313-0c15-4935-8176-9f134385451b" -- minthara
+COMPANION["astarion"] = "c7c13742-bacd-460a-8f65-f864fe41f255" -- astarion
+COMPANION["laezel"] = "58a69333-40bf-8358-1d17-fff240d7fb12" -- lae'zel
+COMPANION["wyll"] = "c774d764-4a17-48dc-b470-32ace9ce447d" -- wyll
+COMPANION["karlach"] = "2c76687d-93a2-477b-8b18-8a14b549304c" -- karlach
+--[[
+EXAMPLE:
+COMPANIONS[""] = "" --
+]]
+
+[DISABLE]
+</AssemblerScript>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>104374</ID>
+                              <Description>"Selected Character Get UUID"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local variable = GetHostCharacter()
+writeString("m_MainCharacter", tostring(variable))
+[DISABLE]
+</AssemblerScript>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>104375</ID>
+                                  <Description>"Variable Saved"</Description>
+                                  <ShowAsSigned>0</ShowAsSigned>
+                                  <VariableType>String</VariableType>
+                                  <Length>36</Length>
+                                  <Unicode>0</Unicode>
+                                  <CodePage>0</CodePage>
+                                  <ZeroTerminate>1</ZeroTerminate>
+                                  <Address>m_MainCharacter</Address>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>104339</ID>
+                              <Description>"Companion "Shadowheart""</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                              <GroupHeader>1</GroupHeader>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>104340</ID>
+                                  <Description>"+10 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["shadowheart"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 10)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104341</ID>
+                                  <Description>"+10 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["shadowheart"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 0)
+SetArgToLong(3, 10)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104342</ID>
+                                  <Description>"+100 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["shadowheart"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 100)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104343</ID>
+                                  <Description>"+100 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["shadowheart"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 0)
+SetArgToLong(3, 100)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>104369</ID>
+                              <Description>"Companion "Gale""</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                              <GroupHeader>1</GroupHeader>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>104370</ID>
+                                  <Description>"+10 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["gale"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 10)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104371</ID>
+                                  <Description>"+10 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["gale"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 0)
+SetArgToLong(3, 10)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104372</ID>
+                                  <Description>"+100 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["gale"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 100)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104373</ID>
+                                  <Description>"+100 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["gale"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 0)
+SetArgToLong(3, 100)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>104364</ID>
+                              <Description>"Companion "Minthara""</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                              <GroupHeader>1</GroupHeader>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>104365</ID>
+                                  <Description>"+10 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["minthara"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 10)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104366</ID>
+                                  <Description>"+10 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["minthara"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 0)
+SetArgToLong(3, 10)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104367</ID>
+                                  <Description>"+100 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["minthara"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 100)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104368</ID>
+                                  <Description>"+100 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["minthara"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 0)
+SetArgToLong(3, 100)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>104359</ID>
+                              <Description>"Companion "Astarion""</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                              <GroupHeader>1</GroupHeader>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>104360</ID>
+                                  <Description>"+10 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["astarion"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 10)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104361</ID>
+                                  <Description>"+10 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["astarion"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 0)
+SetArgToLong(3, 10)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104362</ID>
+                                  <Description>"+100 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["astarion"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 100)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104363</ID>
+                                  <Description>"+100 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["astarion"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 0)
+SetArgToLong(3, 100)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>104354</ID>
+                              <Description>"Companion "Lae'Zel""</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                              <GroupHeader>1</GroupHeader>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>104355</ID>
+                                  <Description>"+10 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["laezel"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 10)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104356</ID>
+                                  <Description>"+10 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["laezel"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 0)
+SetArgToLong(3, 10)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104357</ID>
+                                  <Description>"+100 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["laezel"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 100)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104358</ID>
+                                  <Description>"+100 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["laezel"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 0)
+SetArgToLong(3, 100)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>104349</ID>
+                              <Description>"Companion "Wyll""</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                              <GroupHeader>1</GroupHeader>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>104350</ID>
+                                  <Description>"+10 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["wyll"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 10)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104351</ID>
+                                  <Description>"+10 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["wyll"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 0)
+SetArgToLong(3, 10)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104352</ID>
+                                  <Description>"+100 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["wyll"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 100)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104353</ID>
+                                  <Description>"+100 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["wyll"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 0)
+SetArgToLong(3, 100)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>104344</ID>
+                              <Description>"Companion "Karlach""</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                              <GroupHeader>1</GroupHeader>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>104345</ID>
+                                  <Description>"+10 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["karlach"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 10)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104346</ID>
+                                  <Description>"+10 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["karlach"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 0)
+SetArgToLong(3, 10)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104347</ID>
+                                  <Description>"+100 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["karlach"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 100)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104348</ID>
+                                  <Description>"+100 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToString(0, COMPANION["karlach"])
+SetArgToString(1, GetHostCharacter())
+SetArgToLong(2, 0)
+SetArgToLong(3, 100)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104330</ID>
+                          <Description>"1. Selection"</Description>
+                          <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                          <Color>FFFFFF</Color>
+                          <GroupHeader>1</GroupHeader>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>104331</ID>
+                              <Description>"Select Main Character [Slot 1]"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local variable = GetHostCharacter()
+writeString("m_MainCharacter", tostring(variable))
+[DISABLE]
+</AssemblerScript>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>104332</ID>
+                                  <Description>"Variable Saved"</Description>
+                                  <ShowAsSigned>0</ShowAsSigned>
+                                  <VariableType>String</VariableType>
+                                  <Length>36</Length>
+                                  <Unicode>0</Unicode>
+                                  <CodePage>0</CodePage>
+                                  <ZeroTerminate>1</ZeroTerminate>
+                                  <Address>m_MainCharacter</Address>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>104333</ID>
+                              <Description>"Select Companion [Slot 2]"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local variable = GetHostCharacter()
+writeString("m_Party_2", tostring(variable))
+[DISABLE]
+</AssemblerScript>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>104334</ID>
+                                  <Description>"Variable Saved"</Description>
+                                  <ShowAsSigned>0</ShowAsSigned>
+                                  <VariableType>String</VariableType>
+                                  <Length>36</Length>
+                                  <Unicode>0</Unicode>
+                                  <CodePage>0</CodePage>
+                                  <ZeroTerminate>1</ZeroTerminate>
+                                  <Address>m_Party_2</Address>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>104335</ID>
+                              <Description>"Select Companion [Slot 3]"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local variable = GetHostCharacter()
+writeString("m_Party_3", tostring(variable))
+[DISABLE]
+</AssemblerScript>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>104336</ID>
+                                  <Description>"Variable Saved"</Description>
+                                  <ShowAsSigned>0</ShowAsSigned>
+                                  <VariableType>String</VariableType>
+                                  <Length>36</Length>
+                                  <Unicode>0</Unicode>
+                                  <CodePage>0</CodePage>
+                                  <ZeroTerminate>1</ZeroTerminate>
+                                  <Address>m_Party_3</Address>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>104337</ID>
+                              <Description>"Select Companion [Slot 4]"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local variable = GetHostCharacter()
+writeString("m_Party_4", tostring(variable))
+[DISABLE]
+</AssemblerScript>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>104338</ID>
+                                  <Description>"Variable Saved"</Description>
+                                  <ShowAsSigned>0</ShowAsSigned>
+                                  <VariableType>String</VariableType>
+                                  <Length>36</Length>
+                                  <Unicode>0</Unicode>
+                                  <CodePage>0</CodePage>
+                                  <ZeroTerminate>1</ZeroTerminate>
+                                  <Address>m_Party_4</Address>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104312</ID>
+                          <Description>"2. Add"</Description>
+                          <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                          <Color>FFFFFF</Color>
+                          <GroupHeader>1</GroupHeader>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>104313</ID>
+                              <Description>"Companion [Slot 2]"</Description>
+                              <GroupHeader>1</GroupHeader>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>104316</ID>
+                                  <Description>"+10 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local variable = readString("m_Party_2")
+SetArgToString(0, variable)
+local mc = readString("m_MainCharacter")
+SetArgToString(1, mc)
+SetArgToLong(2, 10)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104317</ID>
+                                  <Description>"+10 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local variable = readString("m_Party_2")
+SetArgToString(0, variable)
+local mc = readString("m_MainCharacter")
+SetArgToString(1, mc)
+SetArgToLong(2, 0)
+SetArgToLong(3, 10)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104318</ID>
+                                  <Description>"+100 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local variable = readString("m_Party_2")
+SetArgToString(0, variable)
+local mc = readString("m_MainCharacter")
+SetArgToString(1, mc)
+SetArgToLong(2, 100)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104319</ID>
+                                  <Description>"+100 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local variable = readString("m_Party_2")
+SetArgToString(0, variable)
+local mc = readString("m_MainCharacter")
+SetArgToString(1, mc)
+SetArgToLong(2, 0)
+SetArgToLong(3, 100)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>104315</ID>
+                              <Description>"Companion [Slot 3]"</Description>
+                              <GroupHeader>1</GroupHeader>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>104320</ID>
+                                  <Description>"+10 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local variable = readString("m_Party_3")
+SetArgToString(0, variable)
+local mc = readString("m_MainCharacter")
+SetArgToString(1, mc)
+SetArgToLong(2, 10)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104321</ID>
+                                  <Description>"+10 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local variable = readString("m_Party_3")
+SetArgToString(0, variable)
+local mc = readString("m_MainCharacter")
+SetArgToString(1, mc)
+SetArgToLong(2, 0)
+SetArgToLong(3, 10)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104322</ID>
+                                  <Description>"+100 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local variable = readString("m_Party_3")
+SetArgToString(0, variable)
+local mc = readString("m_MainCharacter")
+SetArgToString(1, mc)
+SetArgToLong(2, 100)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104323</ID>
+                                  <Description>"+100 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local variable = readString("m_Party_3")
+SetArgToString(0, variable)
+local mc = readString("m_MainCharacter")
+SetArgToString(1, mc)
+SetArgToLong(2, 0)
+SetArgToLong(3, 100)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>104314</ID>
+                              <Description>"Companion [Slot 4]"</Description>
+                              <GroupHeader>1</GroupHeader>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>104324</ID>
+                                  <Description>"+10 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local variable = readString("m_Party_4")
+SetArgToString(0, variable)
+local mc = readString("m_MainCharacter")
+SetArgToString(1, mc)
+SetArgToLong(2, 10)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104325</ID>
+                                  <Description>"+10 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local variable = readString("m_Party_4")
+SetArgToString(0, variable)
+local mc = readString("m_MainCharacter")
+SetArgToString(1, mc)
+SetArgToLong(2, 0)
+SetArgToLong(3, 10)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104326</ID>
+                                  <Description>"+100 Attitude"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local variable = readString("m_Party_4")
+SetArgToString(0, variable)
+local mc = readString("m_MainCharacter")
+SetArgToString(1, mc)
+SetArgToLong(2, 100)
+ExecuteCall("AddAttitudeTowardsPlayer")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>104327</ID>
+                                  <Description>"+100 Approval"</Description>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local variable = readString("m_Party_4")
+SetArgToString(0, variable)
+local mc = readString("m_MainCharacter")
+SetArgToString(1, mc)
+SetArgToLong(2, 0)
+SetArgToLong(3, 100)
+ClearArg(4)
+ExecuteCall("ChangeApprovalRating")
+[DISABLE]
+</AssemblerScript>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>104328</ID>
+                      <Description>"Old Version"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>104303</ID>
+                          <Description>"1. Select Main Character and Activate This Script"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript Async="1">{$lua}
 if syntaxcheck then return end
 [ENABLE]
 SetArgToString(1, GetHostCharacter())
 [DISABLE]
 </AssemblerScript>
-                    </CheatEntry>
-                    <CheatEntry>
-                      <ID>400</ID>
-                      <Description>"2. Select Companion and Activate This Script"</Description>
-                      <VariableType>Auto Assembler Script</VariableType>
-                      <AssemblerScript Async="1">{$lua}
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>400</ID>
+                          <Description>"2. Select Companion and Activate This Script"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript Async="1">{$lua}
 if syntaxcheck then return end
 [ENABLE]
 SetArgToString(0, GetHostCharacter())
 [DISABLE]
 </AssemblerScript>
-                    </CheatEntry>
-                    <CheatEntry>
-                      <ID>397</ID>
-                      <Description>"3. a) Add 100 Attitude"</Description>
-                      <VariableType>Auto Assembler Script</VariableType>
-                      <AssemblerScript Async="1">{$lua}
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>397</ID>
+                          <Description>"3. a) Add 100 Attitude"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript Async="1">{$lua}
 if syntaxcheck then return end
 [ENABLE]
 SetArgToLong(2, 100)
 ExecuteCall("AddAttitudeTowardsPlayer")
 [DISABLE]
 </AssemblerScript>
-                    </CheatEntry>
-                    <CheatEntry>
-                      <ID>104196</ID>
-                      <Description>"3. a) Add 10 Attitude"</Description>
-                      <VariableType>Auto Assembler Script</VariableType>
-                      <AssemblerScript Async="1">{$lua}
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104196</ID>
+                          <Description>"3. a) Add 10 Attitude"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript Async="1">{$lua}
 if syntaxcheck then return end
 [ENABLE]
 SetArgToLong(2, 10)
 ExecuteCall("AddAttitudeTowardsPlayer")
 [DISABLE]
 </AssemblerScript>
-                    </CheatEntry>
-                    <CheatEntry>
-                      <ID>401</ID>
-                      <Description>"3. b) Add 100 Approval"</Description>
-                      <VariableType>Auto Assembler Script</VariableType>
-                      <AssemblerScript Async="1">{$lua}
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>401</ID>
+                          <Description>"3. b) Add 100 Approval"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript Async="1">{$lua}
 if syntaxcheck then return end
 [ENABLE]
 SetArgToLong(2, 0)
@@ -46894,12 +49378,12 @@ ClearArg(4)
 ExecuteCall("ChangeApprovalRating")
 [DISABLE]
 </AssemblerScript>
-                    </CheatEntry>
-                    <CheatEntry>
-                      <ID>104197</ID>
-                      <Description>"3. b) Add 10 Approval"</Description>
-                      <VariableType>Auto Assembler Script</VariableType>
-                      <AssemblerScript Async="1">{$lua}
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104197</ID>
+                          <Description>"3. b) Add 10 Approval"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript Async="1">{$lua}
 if syntaxcheck then return end
 [ENABLE]
 SetArgToLong(2, 0)
@@ -46907,6 +49391,73 @@ SetArgToLong(3, 10)
 ClearArg(4)
 ExecuteCall("ChangeApprovalRating")
 [DISABLE]
+</AssemblerScript>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>104203</ID>
+                  <Description>"Weapon Passive Enchantments"</Description>
+                  <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>104204</ID>
+                      <Description>"Attacks Create Water Surface [2WS]"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_LC_Wave_Trident_Passive"
+[ENABLE]
+local result = AddPassiveToWeapon(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromWeapon(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>104205</ID>
+                      <Description>"Thunderclap [2WS]"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "Potion_OfGiant_ThunderDamage_Passive"
+[ENABLE]
+local result = AddPassiveToWeapon(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromWeapon(passive)
+if result ~= 1 then
+  print("command failed")
+end
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>4873</ID>
+                      <Description>"Aura of Murder [2WS]"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>{$lua}
+if syntaxcheck then return end
+passive = "MAG_TheClover_Mainhand_Passive"
+[ENABLE]
+local result = AddPassiveToWeapon(passive)
+if result ~= 1 then
+  print("command failed")
+end
+[DISABLE]
+local result = RemovePassiveFromWeapon(passive)
+if result ~= 1 then
+  print("command failed")
+end
 </AssemblerScript>
                     </CheatEntry>
                   </CheatEntries>
@@ -53295,6 +55846,10 @@ bg3.exe+10D47E6: 48 8D 4C 24 48        - lea rcx,[rsp+48]
 EnableAutoScriptDisabler = al.getMemoryRecordByID(4780)
 KeepReattaching = al.getMemoryRecordByID(5519)
 
+-- SETTINGS --
+EnableAutoScriptDisabler.Active = true
+KeepReattaching.Active = true
+-- SETTINGS --
 
 function onMemRecPostExecute(memrec, newState, succeeded)
   -- Disable option of auto disabling completly
