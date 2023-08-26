@@ -3,6 +3,7 @@ Cheat engine table for game Baldur's Gate 3
 
 Note: Before enabling Register Commands, you must first load your saved game.
 
+**Desclaimer: Features are not properly named below yet will do that later**
 Features:
 - Automatically attaching to proper game process (this option is auto enabled)
 - Reattach script
@@ -39,3 +40,9 @@ Features:
  - Toggle Fog of War
  - Item Spawner (sometimes game crashes so save game after each use)
  - Multiple Companions Attitude/Approval
+ 
+ 
+ 
+Credits to: Zanzer, Cidrow, Quan lee, Thekross, Avike, TheMaoci
+
+Link: https://fearlessrevolution.com/viewtopic.php?p=311856#p311856

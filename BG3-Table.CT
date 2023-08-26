@@ -1920,22 +1920,37 @@ bg3.exe+21CE3A6: 48 3B DD        - cmp rbx,rbp
           <Options moHideChildren="1"/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript Async="1">[ENABLE]
-aobscanmodule(cmdPtr,$process,48 8B 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 41 B0)
-alloc(cmdCode,0x4096,cmdPtr)
-alloc(cmdStr0,0x512)
-alloc(cmdStr1,0x512)
-alloc(cmdStr2,0x512)
-alloc(cmdStr3,0x512)
-alloc(cmdStr4,0x512)
+aobscanmodule(console,$process,81 E2 FF FF FF 01 3B)
+alloc(newmem,$1000,console)
+alloc(cmdCode,$1000)
+alloc(cmdStr0,$1000)
+alloc(cmdStr1,$1000)
+alloc(cmdStr2,$1000)
+alloc(cmdStr3,$1000)
+alloc(cmdStr4,$1000)
 
-label(cmdList)
 label(cmdCall)
 label(cmdArgs)
 label(cmdSelf)
 label(cmdAddr)
+label(cmdList)
+label(code)
+label(return)
 
-cmdPtr+(DWORD)[cmdPtr+03]+07:
+newmem:
+  mov rax,cmdList
+  mov [rax],rcx
+code:
+  and edx,01FFFFFF
+  jmp return
+
 cmdList:
+  dq 0
+
+console:
+  jmp newmem
+  nop
+return:
 
 cmdCode:
 align 10
@@ -1969,6 +1984,7 @@ cmdArgs:
   dq 0
   dq 0
 
+registersymbol(console)
 registersymbol(cmdList)
 registersymbol(cmdCall)
 registersymbol(cmdAddr)
@@ -1980,11 +1996,12 @@ registersymbol(cmdStr2)
 registersymbol(cmdStr3)
 registersymbol(cmdStr4)
 
-{$lua}
-local registerConsole = getAddressList().getMemoryRecordByID(357)
-registerConsole.Active = true
-
 [DISABLE]
+console:
+  db 81 E2 FF FF FF 01
+unregistersymbol(console)
+dealloc(newmem)
+
 unregistersymbol(cmdList)
 unregistersymbol(cmdCode)
 unregistersymbol(cmdStr0)
@@ -2000,59 +2017,31 @@ dealloc(cmdStr3)
 dealloc(cmdStr4)
 
 {
-// ORIGINAL CODE - INJECTION POINT: bg3.exe+53DD790
+// ORIGINAL CODE - INJECTION POINT: bg3.exe+2F153D3
 
-bg3.exe+53DD766: 74 34                    - je bg3.exe+53DD79C
-bg3.exe+53DD768: 48 8D 05 71 6F E6 04     - lea rax,[bg3.exe+A2446E0]
-bg3.exe+53DD76F: 48 89 44 24 38           - mov [rsp+38],rax
-bg3.exe+53DD774: C7 44 24 40 01 00 00 00  - mov [rsp+40],00000001
-bg3.exe+53DD77C: 48 8D 54 24 38           - lea rdx,[rsp+38]
-bg3.exe+53DD781: 48 8D 4D 00              - lea rcx,[rbp+00]
-bg3.exe+53DD785: E8 F6 E7 CF 02           - call bg3.exe+80DBF80
-bg3.exe+53DD78A: 85 C0                    - test eax,eax
-bg3.exe+53DD78C: 75 0E                    - jne bg3.exe+53DD79C
-bg3.exe+53DD78E: 33 D2                    - xor edx,edx
+bg3.exe+2F153B7: 75 0A              - jne bg3.exe+2F153C3
+bg3.exe+2F153B9: 48 8B 4F 10        - mov rcx,[rdi+10]
+bg3.exe+2F153BD: FF 15 85 08 97 01  - call qword ptr [bg3.exe+4885C48]
+bg3.exe+2F153C3: 48 8B 5C 24 30     - mov rbx,[rsp+30]
+bg3.exe+2F153C8: 48 83 C4 20        - add rsp,20
+bg3.exe+2F153CC: 5F                 - pop rdi
+bg3.exe+2F153CD: C3                 - ret
+bg3.exe+2F153CE: CC                 - int 3
+bg3.exe+2F153CF: CC                 - int 3
+bg3.exe+2F153D0: C1 EA 03           - shr edx,03
 // ---------- INJECTING HERE ----------
-bg3.exe+53DD790: 48 8B 0D 29 BF 73 06     - mov rcx,[bg3.exe+BB196C0]
+bg3.exe+2F153D3: 81 E2 FF FF FF 01  - and edx,01FFFFFF
 // ---------- DONE INJECTING  ----------
-bg3.exe+53DD797: E8 A4 15 36 FE           - call bg3.exe+373ED40
-bg3.exe+53DD79C: 48 8B 0D A5 BE 73 06     - mov rcx,[bg3.exe+BB19648]
-bg3.exe+53DD7A3: E8 A8 C9 2E FE           - call bg3.exe+36CA150
-bg3.exe+53DD7A8: 41 B0 01                 - mov r8l,01
-bg3.exe+53DD7AB: 48 8B D7                 - mov rdx,rdi
-bg3.exe+53DD7AE: 48 8B 0D 93 BE 73 06     - mov rcx,[bg3.exe+BB19648]
-bg3.exe+53DD7B5: E8 96 C6 2E FE           - call bg3.exe+36C9E50
-bg3.exe+53DD7BA: 48 8B D7                 - mov rdx,rdi
-bg3.exe+53DD7BD: 48 8B 0D 44 BE 73 06     - mov rcx,[bg3.exe+BB19608]
-bg3.exe+53DD7C4: E8 17 1A 6B 02           - call bg3.exe+7A8F1E0
-}
-
-{
-// ORIGINAL CODE - INJECTION POINT: "bg3.exe"+1E263F8
-
-"bg3.exe"+1E263CA: 48 81 C1 00 01 00 00  -  add rcx,00000100
-"bg3.exe"+1E263D1: 48 8B EA              -  mov rbp,rdx
-"bg3.exe"+1E263D4: E8 C7 56 5D 00        -  call bg3.exe+23FBAA0
-"bg3.exe"+1E263D9: 45 33 C0              -  xor r8d,r8d
-"bg3.exe"+1E263DC: 48 8D 8B C8 00 00 00  -  lea rcx,[rbx+000000C8]
-"bg3.exe"+1E263E3: 48 8B D5              -  mov rdx,rbp
-"bg3.exe"+1E263E6: E8 F5 D1 5C 00        -  call bg3.exe+23F35E0
-"bg3.exe"+1E263EB: 45 33 C0              -  xor r8d,r8d
-"bg3.exe"+1E263EE: 48 8D 8B 30 01 00 00  -  lea rcx,[rbx+00000130]
-"bg3.exe"+1E263F5: 48 8B D5              -  mov rdx,rbp
-// ---------- INJECTING HERE ----------
-"bg3.exe"+1E263F8: E8 73 8A 5D 00        -  call bg3.exe+23FEE70
-// ---------- DONE INJECTING  ----------
-"bg3.exe"+1E263FD: 48 8B 0D 84 7E D2 03  -  mov rcx,[bg3.exe+5B4E288]
-"bg3.exe"+1E26404: E8 C7 21 25 00        -  call bg3.exe+20785D0
-"bg3.exe"+1E26409: 41 B0 01              -  mov r8l,01
-"bg3.exe"+1E2640C: 48 8D 8B 00 01 00 00  -  lea rcx,[rbx+00000100]
-"bg3.exe"+1E26413: 48 8B D5              -  mov rdx,rbp
-"bg3.exe"+1E26416: E8 85 56 5D 00        -  call bg3.exe+23FBAA0
-"bg3.exe"+1E2641B: 41 B0 01              -  mov r8l,01
-"bg3.exe"+1E2641E: 48 8D 8B C8 00 00 00  -  lea rcx,[rbx+000000C8]
-"bg3.exe"+1E26425: 48 8B D5              -  mov rdx,rbp
-"bg3.exe"+1E26428: E8 B3 D1 5C 00        -  call bg3.exe+23F35E0
+bg3.exe+2F153D9: 3B 51 2C           - cmp edx,[rcx+2C]
+bg3.exe+2F153DC: 73 09              - jae bg3.exe+2F153E7
+bg3.exe+2F153DE: 48 8B 41 20        - mov rax,[rcx+20]
+bg3.exe+2F153E2: 48 8B 04 D0        - mov rax,[rax+rdx*8]
+bg3.exe+2F153E6: C3                 - ret
+bg3.exe+2F153E7: 33 C0              - xor eax,eax
+bg3.exe+2F153E9: C3                 - ret
+bg3.exe+2F153EA: CC                 - int 3
+bg3.exe+2F153EB: CC                 - int 3
+bg3.exe+2F153EC: CC                 - int 3
 }
 </AssemblerScript>
           <CheatEntries>
@@ -2088,24 +2077,39 @@ if ConsoleCommands.Active == false then
 end
 
 local commands = readPointer("cmdList")
-commands = readPointer(commands + 0x10)
+if commands == 0 then
+  print("plaese load a saved game first")
+  return
+end
 local size = readInteger(commands + 0x2C)
-if size &gt; 3000 then
+print("Commands Found: " .. tostring(size))
+if size &lt;= 0 then
+  print("please load a saved game first")
+  return
+elseif size &gt; 3000 then
   size = 3000 -- just in case
 end
 commands = readPointer(commands + 0x20)
 COMMAND_SELF = {}
 for i = 1, size do
   local addr = readPointer(commands)
-  local name = readPointer(addr + 0x08)
-  name = readString(name, 256, false)
-  local self = readPointer(addr + 0x40)
-  addr = readPointer(addr + 0x48)
-  COMMAND_SELF[name] = self
-  --print("Command: " .. name)
-  if addr &gt; 0x1000 then
-    unregisterSymbol(name)
-    registerSymbol(name, addr, true)
+  if addr &gt; 0 then
+    local name = readPointer(addr + 0x08)
+    if name &gt; 0 then
+      name = readString(name, 256, false)
+      local self = readPointer(addr + 0x40)
+      --print(i .. " - " .. name .. " -&gt; " .. tostring(addr))
+      addr = readPointer(addr + 0x48)
+      COMMAND_SELF[name] = self
+      if addr &gt; 0x1000 then
+        unregisterSymbol(name)
+        registerSymbol(name, addr, true)
+      end
+    else
+     --print(i .. " name address if fucked")
+    end
+  else
+   --print(i .. " addr address if fucked")
   end
   commands = commands + 0x08
 end
@@ -2147,6 +2151,7 @@ end
 function GetStringAt(i)
   return getAddress("cmdStr"..i)
 end
+
 function ClearArgs()
   for i = 0, 7 do
    ClearArg(i)
@@ -52235,6 +52240,736 @@ bg3.exe+492BC7D: 48 89 44 24 48        - mov [rsp+48],rax
           <Color>FF0000</Color>
           <GroupHeader>1</GroupHeader>
           <CheatEntries>
+            <CheatEntry>
+              <ID>104379</ID>
+              <Description>"Console Commands OLD"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(cmdPtr,$process,48 8B 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 41 B0)
+alloc(cmdCode,0x4096,cmdPtr)
+alloc(cmdStr0,0x512)
+alloc(cmdStr1,0x512)
+alloc(cmdStr2,0x512)
+alloc(cmdStr3,0x512)
+alloc(cmdStr4,0x512)
+
+label(cmdList)
+label(cmdCall)
+label(cmdArgs)
+label(cmdSelf)
+label(cmdAddr)
+
+cmdPtr+(DWORD)[cmdPtr+03]+07:
+cmdList:
+
+cmdCode:
+align 10
+cmdCall:
+sub rsp,38
+mov rdx,cmdArgs
+mov rax,cmdAddr
+mov rcx,cmdSelf
+mov rcx,[rcx]
+call [rax]
+add rsp,38
+movzx rax,al
+ret
+
+align 10
+cmdAddr:
+  dq 0
+align 10
+cmdSelf:
+  dq 0
+align 10
+cmdArgs:
+  dq 0
+  dq 0
+  dq 0
+  dq 0
+  dq 0
+  dq 0
+  dq 0
+  dq 0
+  dq 0
+  dq 0
+
+registersymbol(cmdList)
+registersymbol(cmdCall)
+registersymbol(cmdAddr)
+registersymbol(cmdSelf)
+registersymbol(cmdArgs)
+registersymbol(cmdStr0)
+registersymbol(cmdStr1)
+registersymbol(cmdStr2)
+registersymbol(cmdStr3)
+registersymbol(cmdStr4)
+
+{$lua}
+local registerConsole = getAddressList().getMemoryRecordByID(357)
+registerConsole.Active = true
+
+[DISABLE]
+unregistersymbol(cmdList)
+unregistersymbol(cmdCode)
+unregistersymbol(cmdStr0)
+unregistersymbol(cmdStr1)
+unregistersymbol(cmdStr2)
+unregistersymbol(cmdStr3)
+unregistersymbol(cmdStr4)
+dealloc(cmdCode)
+dealloc(cmdStr0)
+dealloc(cmdStr1)
+dealloc(cmdStr2)
+dealloc(cmdStr3)
+dealloc(cmdStr4)
+
+{
+// ORIGINAL CODE - INJECTION POINT: bg3.exe+53DD790
+
+bg3.exe+53DD766: 74 34                    - je bg3.exe+53DD79C
+bg3.exe+53DD768: 48 8D 05 71 6F E6 04     - lea rax,[bg3.exe+A2446E0]
+bg3.exe+53DD76F: 48 89 44 24 38           - mov [rsp+38],rax
+bg3.exe+53DD774: C7 44 24 40 01 00 00 00  - mov [rsp+40],00000001
+bg3.exe+53DD77C: 48 8D 54 24 38           - lea rdx,[rsp+38]
+bg3.exe+53DD781: 48 8D 4D 00              - lea rcx,[rbp+00]
+bg3.exe+53DD785: E8 F6 E7 CF 02           - call bg3.exe+80DBF80
+bg3.exe+53DD78A: 85 C0                    - test eax,eax
+bg3.exe+53DD78C: 75 0E                    - jne bg3.exe+53DD79C
+bg3.exe+53DD78E: 33 D2                    - xor edx,edx
+// ---------- INJECTING HERE ----------
+bg3.exe+53DD790: 48 8B 0D 29 BF 73 06     - mov rcx,[bg3.exe+BB196C0]
+// ---------- DONE INJECTING  ----------
+bg3.exe+53DD797: E8 A4 15 36 FE           - call bg3.exe+373ED40
+bg3.exe+53DD79C: 48 8B 0D A5 BE 73 06     - mov rcx,[bg3.exe+BB19648]
+bg3.exe+53DD7A3: E8 A8 C9 2E FE           - call bg3.exe+36CA150
+bg3.exe+53DD7A8: 41 B0 01                 - mov r8l,01
+bg3.exe+53DD7AB: 48 8B D7                 - mov rdx,rdi
+bg3.exe+53DD7AE: 48 8B 0D 93 BE 73 06     - mov rcx,[bg3.exe+BB19648]
+bg3.exe+53DD7B5: E8 96 C6 2E FE           - call bg3.exe+36C9E50
+bg3.exe+53DD7BA: 48 8B D7                 - mov rdx,rdi
+bg3.exe+53DD7BD: 48 8B 0D 44 BE 73 06     - mov rcx,[bg3.exe+BB19608]
+bg3.exe+53DD7C4: E8 17 1A 6B 02           - call bg3.exe+7A8F1E0
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: "bg3.exe"+1E263F8
+
+"bg3.exe"+1E263CA: 48 81 C1 00 01 00 00  -  add rcx,00000100
+"bg3.exe"+1E263D1: 48 8B EA              -  mov rbp,rdx
+"bg3.exe"+1E263D4: E8 C7 56 5D 00        -  call bg3.exe+23FBAA0
+"bg3.exe"+1E263D9: 45 33 C0              -  xor r8d,r8d
+"bg3.exe"+1E263DC: 48 8D 8B C8 00 00 00  -  lea rcx,[rbx+000000C8]
+"bg3.exe"+1E263E3: 48 8B D5              -  mov rdx,rbp
+"bg3.exe"+1E263E6: E8 F5 D1 5C 00        -  call bg3.exe+23F35E0
+"bg3.exe"+1E263EB: 45 33 C0              -  xor r8d,r8d
+"bg3.exe"+1E263EE: 48 8D 8B 30 01 00 00  -  lea rcx,[rbx+00000130]
+"bg3.exe"+1E263F5: 48 8B D5              -  mov rdx,rbp
+// ---------- INJECTING HERE ----------
+"bg3.exe"+1E263F8: E8 73 8A 5D 00        -  call bg3.exe+23FEE70
+// ---------- DONE INJECTING  ----------
+"bg3.exe"+1E263FD: 48 8B 0D 84 7E D2 03  -  mov rcx,[bg3.exe+5B4E288]
+"bg3.exe"+1E26404: E8 C7 21 25 00        -  call bg3.exe+20785D0
+"bg3.exe"+1E26409: 41 B0 01              -  mov r8l,01
+"bg3.exe"+1E2640C: 48 8D 8B 00 01 00 00  -  lea rcx,[rbx+00000100]
+"bg3.exe"+1E26413: 48 8B D5              -  mov rdx,rbp
+"bg3.exe"+1E26416: E8 85 56 5D 00        -  call bg3.exe+23FBAA0
+"bg3.exe"+1E2641B: 41 B0 01              -  mov r8l,01
+"bg3.exe"+1E2641E: 48 8D 8B C8 00 00 00  -  lea rcx,[rbx+000000C8]
+"bg3.exe"+1E26425: 48 8B D5              -  mov rdx,rbp
+"bg3.exe"+1E26428: E8 B3 D1 5C 00        -  call bg3.exe+23F35E0
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>104380</ID>
+              <Description>"Register Commands OLD"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+
+local ConsoleCommands = getAddressList().getMemoryRecordByID(347)
+if ConsoleCommands.Active == false then
+   ConsoleCommands.Active = true
+   Sleep(500)
+end
+
+local commands = readPointer("cmdList")
+commands = readPointer(commands + 0x10)
+local size = readInteger(commands + 0x2C)
+if size &gt; 3000 then
+  size = 3000 -- just in case
+end
+commands = readPointer(commands + 0x20)
+COMMAND_SELF = {}
+for i = 1, size do
+  local addr = readPointer(commands)
+  local name = readPointer(addr + 0x08)
+  name = readString(name, 256, false)
+  local self = readPointer(addr + 0x40)
+  addr = readPointer(addr + 0x48)
+  COMMAND_SELF[name] = self
+  --print("Command: " .. name)
+  if addr &gt; 0x1000 then
+    unregisterSymbol(name)
+    registerSymbol(name, addr, true)
+  end
+  commands = commands + 0x08
+end
+
+function PrepareCall(name)
+  local cmdAddr = getAddress("cmdAddr")
+  local cmdSelf = getAddress("cmdSelf")
+  local cmd = getAddress(name)
+  writePointer(cmdAddr, cmd)
+  writePointer(cmdSelf, COMMAND_SELF[name])
+end
+
+function ExecuteCall(FuncName)
+  local cmdAddr = getAddress("cmdAddr")
+  local cmdSelf = getAddress("cmdSelf")
+  local cmdCall = getAddress("cmdCall")
+  local cmd = getAddress(FuncName)
+  if cmdAddr == nil then
+     print("ERROR: cmdAddr is nil")
+  end
+  if cmdSelf == nil then
+     print("ERROR: cmdSelf is nil")
+  end
+  if cmdCall == nil then
+     print("ERROR: cmdCall is nil")
+  end
+  if cmd == nil then
+     print("ERROR: cmd is nil")
+  end
+  writePointer(cmdAddr, cmd)
+  writePointer(cmdSelf, COMMAND_SELF[FuncName])
+  return executeCodeEx(0, nil, cmdCall)
+end
+
+function GetArgAt(i)
+  return getAddress("cmdArgs") + 0x10 * i + 0x08
+end
+
+function GetStringAt(i)
+  return getAddress("cmdStr"..i)
+end
+function ClearArgs()
+  for i = 0, 7 do
+   ClearArg(i)
+  end
+end
+function ClearArg(i)
+  SetArgToLong(i, 0)
+end
+
+function GetArgAsInteger(i)
+  local arg = GetArgAt(i)
+  return readInteger(arg)
+end
+
+function SetArgToInteger(i, value)
+  local arg = GetArgAt(i)
+  if value == nil then value = 0 end
+  writeQword(arg, value)
+end
+
+function GetArgAsLong(i)
+  local arg = GetArgAt(i)
+  return readQword(arg)
+end
+
+function SetArgToLong(i, value)
+  local arg = GetArgAt(i)
+  if value == nil then value = 0 end
+  writeQword(arg, value)
+end
+
+function GetArgAsFloat(i)
+  local arg = GetArgAt(i)
+  return readFloat(arg)
+end
+
+function SetArgToFloat(i, value)
+  local arg = GetArgAt(i)
+  if value == nil then value = 0 end
+  writeFloat(arg, value)
+end
+
+function SetArgToPointer(i, value)
+  local arg = GetArgAt(i)
+  if value == nil then value = 0 end
+  writePointer(arg, value)
+end
+
+function GetArgAsString(i)
+  local arg = GetArgAt(i)
+  local value = readPointer(arg)
+  if value and value &gt; 0 then
+    return readString(value, 256, false)
+  end
+  return nil
+end
+
+function SetArgToString(i, value)
+  local str = GetStringAt(i)
+  writeString(str, value)
+  writeBytes(str + #value, 0)
+  SetArgToPointer(i, str)
+end
+
+function GetHostCharacter()
+  ClearArg(0)
+  ExecuteCall("GetHostCharacter")
+  return GetArgAsString(0)
+end
+
+function AddPassive(Entity, PassiveID)
+  SetArgToString(0, Entity)
+  if type(PassiveID) == "table" then
+    for i = 1, #PassiveID do
+      SetArgToString(1, PassiveID[i])
+      ExecuteCall("AddPassive")
+    end
+  else
+    SetArgToString(1, PassiveID)
+    ExecuteCall("AddPassive")
+  end
+end
+
+function AddPassiveToPlayer(PassiveID)
+  local player = GetHostCharacter()
+  AddPassive(player, PassiveID)
+end
+
+function RemovePassive(Entity, PassiveID)
+  SetArgToString(0, Entity)
+  if type(PassiveID) == "table" then
+    for i = 1, #PassiveID do
+      local value = PassiveID[i]
+      SetArgToString(1, value)
+      ExecuteCall("RemovePassive")
+    end
+  else
+    SetArgToString(1, PassiveID)
+    ExecuteCall("RemovePassive")
+  end
+end
+
+function RemovePassiveFromPlayer(PassiveID)
+  local player = GetHostCharacter()
+  RemovePassive(player, PassiveID)
+end
+
+function AddBoosts(Object, Boosts, SourceID, Cause)
+  SetArgToString(0, Object)
+  SetArgToLong(2, SourceID)
+  SetArgToLong(3, Cause)
+  if type(Boosts) == "table" then
+    for i = 1, #Boosts do
+      SetArgToString(1, Boosts[i])
+      ExecuteCall("AddBoosts")
+    end
+  else
+    SetArgToString(1, Boosts)
+    ExecuteCall("AddBoosts")
+  end
+end
+
+function AddBoostsToPlayer(Boosts)
+  local player = GetHostCharacter()
+  AddBoosts(player, Boosts, 0, 0)
+end
+
+function RemoveBoosts(Object, Boosts, RemoveOnlyFirstDescMatch, SourceID, Cause)
+  SetArgToString(0, Object)
+  SetArgToLong(2, RemoveOnlyFirstDescMatch)
+  SetArgToLong(3, SourceID)
+  SetArgToLong(4, Cause)
+  if type(Boosts) == "table" then
+    for i = 1, #Boosts do
+      SetArgToString(1, Boosts[i])
+      ExecuteCall("RemoveBoosts")
+    end
+  else
+    SetArgToString(1, Boosts)
+    ExecuteCall("RemoveBoosts")
+  end
+end
+
+function RemoveBoostsFromPlayer(Boosts)
+  local player = GetHostCharacter()
+  RemoveBoosts(player, Boosts, 0, 0, 0)
+end
+
+function ApplyStatus(Object, Status, Duration, Force, Source)
+  if Duration == nil then
+    Duration = -1
+  end
+  SetArgToString(0, Object)
+  SetArgToFloat(2, Duration)
+  SetArgToLong(3, Force)
+  SetArgToLong(4, Source)
+  if type(Status) == "table" then
+    for i = 1, #Status do
+      SetArgToString(1, Status[i])
+      ExecuteCall("ApplyStatus")
+    end
+  else
+    SetArgToString(1, Status)
+    ExecuteCall("ApplyStatus")
+  end
+end
+
+function ApplyStatusToPlayer(Status, Duration)
+  local player = GetHostCharacter()
+  ApplyStatus(player, Status, Duration, 1, 0)
+end
+
+function ApplyStatusToWeapon(Status)
+  local item = GetEquippedWeapon()
+  ApplyStatus(item, Status, Duration, 1, 0)
+end
+
+function RemoveStatus(Target, Status, Cause)
+  SetArgToString(0, Target)
+  SetArgToLong(2, Cause)
+  if type(Status) == "table" then
+    for i = 1, #Status do
+      SetArgToString(1, Status[i])
+      ExecuteCall("RemoveStatus")
+    end
+  else
+    SetArgToString(1, Status)
+    ExecuteCall("RemoveStatus")
+  end
+end
+
+function RemoveStatusFromPlayer(Status)
+  local player = GetHostCharacter()
+  RemoveStatus(player, Status, 0)
+end
+
+function RemoveStatusFromWeapon(Status)
+  local item = GetEquippedWeapon()
+  RemoveStatus(item, Status, 0)
+end
+
+function AddSpell(Character, Spell, ShowNotification, AddContainerSpells)
+  SetArgToString(0, Character)
+  SetArgToLong(2, ShowNotification)
+  SetArgToLong(3, AddContainerSpells)
+  if type(Spell) == "table" then
+    for i = 1, #Spell do
+      SetArgToString(1, Spell[i])
+      ExecuteCall("AddSpell")
+    end
+  else
+    SetArgToString(1, Status)
+    ExecuteCall("AddSpell")
+  end
+end
+
+function AddSpellToPlayer(Spell)
+  local player = GetHostCharacter()
+  AddSpell(player, Spell, 0, 1)
+end
+
+function RemoveSpell(Character, Spell, RemoveContainerSpells)
+  SetArgToString(0, Character)
+  SetArgToLong(2, RemoveContainerSpells)
+  if type(Spell) == "table" then
+    for i = 1, #Spell do
+      SetArgToString(1, Spell[i])
+      ExecuteCall("RemoveSpell")
+    end
+  else
+    SetArgToString(1, Status)
+    ExecuteCall("RemoveSpell")
+  end
+end
+
+function RemoveSpellFromPlayer(Spell)
+  local player = GetHostCharacter()
+  RemoveSpell(player, Spell, 0)
+end
+
+function SetTag(Target, Tag)
+  SetArgToString(0, Target)
+  if type(Tag) == "table" then
+    for i = 1, #Tag do
+      SetArgToString(1, Tag[i])
+      ExecuteCall("SetTag")
+    end
+  else
+    SetArgToString(1, Tag)
+    return ExecuteCall("SetTag")
+  end
+end
+
+function SetTagOnPlayer(Tag)
+  local player = GetHostCharacter()
+  return SetTag(player, Tag)
+end
+
+function ClearTag(Target, Tag)
+  SetArgToString(0, Target)
+  if type(Tag) == "table" then
+    for i = 1, #Tag do
+      SetArgToString(1, Tag[i])
+      ExecuteCall("ClearTag")
+    end
+  else
+    SetArgToString(1, Tag)
+    return ExecuteCall("ClearTag")
+  end
+end
+
+function ClearTagOnPlayer(Tag)
+  local player = GetHostCharacter()
+  return ClearTag(player, Tag)
+end
+
+function IsTagged(Target, Tag)
+  SetArgToString(0, Target)
+  SetArgToString(1, Tag)
+  SetArgToLong(2, 0)
+  local result = ExecuteCall("IsTagged")
+  if result == 1 then
+    return GetArgAsInteger(2)
+  else
+    return nil
+  end
+end
+
+function IsTaggedOnPlayer(Tag)
+  local player = GetHostCharacter()
+  return IsTagged(player, Tag)
+end
+
+function SetFlag(Flag, Object, DialogInstance, SendFlagSetEventIfChanged)
+  SetArgToString(1, Object)
+  SetArgToLong(2, DialogInstance)
+  SetArgToLong(3, SendFlagSetEventIfChanged)
+  if type(Flag) == "table" then
+    for i = 1, #Flag do
+      SetArgToString(0, Flag[i])
+      ExecuteCall("SetFlag")
+    end
+  else
+    SetArgToString(0, Flag)
+    return ExecuteCall("SetFlag")
+  end
+end
+
+function SetFlagOnPlayer(Flag)
+  local player = GetHostCharacter()
+  return SetFlag(Flag, player, 0, 1)
+end
+
+function GetFlag(Flag, Object)--: FlagState
+  SetArgToString(0, Flag)
+  SetArgToString(1, Object)
+  SetArgToLong(2, 0)
+  local result = ExecuteCall("GetFlag")
+  if result == 1 then
+    return GetArgAsInteger(2)
+  else
+    return nil
+  end
+end
+
+function GetFlagOnPlayer(Flag)
+  local player = GetHostCharacter()
+  return GetFlag(Flag, player)
+end
+
+function ClearFlag(Flag, Object, DialogInstance, SendFlagClearEventIfChanged)
+  SetArgToString(1, Object)
+  SetArgToLong(2, DialogInstance)
+  SetArgToLong(3, SendFlagClearEventIfChanged)
+  if type(Flag) == "table" then
+    for i = 1, #Flag do
+      SetArgToString(0, Flag[i])
+      ExecuteCall("ClearFlag")
+    end
+  else
+    SetArgToString(0, Flag)
+    return ExecuteCall("ClearFlag")
+  end
+end
+
+function ClearFlagOnPlayer(Flag)
+  local player = GetHostCharacter()
+  return ClearFlag(Flag, player, 0, 1)
+end
+
+function TemplateAddTo(ItemTemplate, InventoryHolder, Count, ShowNotification)
+  if Count == nil then Count = 1 end
+  if ShowNotification == nil then ShowNotification = 0 end
+  SetArgToString(1, InventoryHolder)
+  SetArgToLong(2, Count)
+  SetArgToLong(3, ShowNotification)
+  ExecuteCall("TemplateAddTo")
+  Sleep(5)
+  if type(ItemTemplate) == "table" then
+    for i = 1, #ItemTemplate do
+      SetArgToString(0, ItemTemplate[i])
+      ExecuteCall("TemplateAddTo")
+      Sleep(5)
+    end
+  else
+    SetArgToString(0, ItemTemplate)
+    ExecuteCall("TemplateAddTo")
+    Sleep(5)
+    end
+end
+
+function TemplateAddToPlayer(ItemTemplate, Count)
+  local player = GetHostCharacter()
+  Sleep(5)
+  TemplateAddTo(ItemTemplate, player, Count, 1)
+  Sleep(5)
+end
+
+function GetPosition(Target)--: X: Y: Z
+  SetArgToString(0, Target)
+  ClearArg(1)
+  ClearArg(2)
+  ClearArg(3)
+  ExecuteCall("GetPosition")
+  local x = GetArgAsFloat(1)
+  local z = GetArgAsFloat(2)
+  local y = GetArgAsFloat(3)
+  return x, y, z
+end
+
+function GetPositionOfPlayer()
+  local player = GetHostCharacter()
+  return GetPosition(player)
+end
+
+function CreateAt(TemplateId, X, Y, Z, Temporary, PlaySpawn, SpawnFinishEvent)--: CreatedObject
+  SetArgToString(0, TemplateId)
+  SetArgToFloat(1, X)
+  SetArgToFloat(2, Z)
+  SetArgToFloat(3, Y)
+  SetArgToLong(4, Temporary)
+  SetArgToLong(5, PlaySpawn)
+  SetArgToLong(6, SpawnFinishEvent)
+  ClearArg(7)
+  ExecuteCall("CreateAt")
+  return GetArgAsString(7)
+end
+
+function CreateAtPosition(TemplateId, X, Y, Z)
+  if X == nil or Y == nil or Z == nil then
+    X, Y, Z = GetPositionOfPlayer()
+  end
+  return CreateAt(TemplateId, X, Y, Z, 0, 0, 0)
+end
+
+function CreateAtObject(TemplateId, Anchor, Temporary, PlaySpawn, SpawnFinishEvent, MatchOrientation)--: CreatedObject
+  SetArgToString(0, TemplateId)
+  SetArgToString(1, Anchor)
+  SetArgToLong(2, Temporary)
+  SetArgToLong(3, PlaySpawn)
+  SetArgToLong(4, SpawnFinishEvent)
+  SetArgToLong(5, MatchOrientation)
+  ClearArg(6)
+  ExecuteCall("CreateAtObject")
+  return GetArgAsString(6)
+end
+
+function CreateAtPlayer(TemplateId)
+  local player = GetHostCharacter()
+  return CreateAtObject(TemplateId, player, 0, 0, 0, 0)
+end
+
+function GenerateTreasure(InventoryHolder, TreasureID, Level, Finder)
+  SetArgToString(0, InventoryHolder)
+  SetArgToString(1, TreasureID)
+  SetArgToLong(2, Level)
+  SetArgToString(3, Finder)
+  ClearArg(4)
+  ExecuteCall("GenerateTreasure")
+end
+
+function GenerateTreasureBag(TreasureID)
+  local player = GetHostCharacter()
+  local bag = "3e6aac21-333b-4812-a554-376c2d157ba9"
+  bag = CreateAtObject(bag, player, 0, 0, 0, 0)
+  GenerateTreasure(bag, TreasureID, 12, player)
+  return bag
+end
+
+function GetEquippedWeapon(Character)
+  if Character == nil then
+    Character = GetHostCharacter()
+  end
+  SetArgToString(0, Character)
+  ClearArg(1)
+  ExecuteCall("GetEquippedWeapon")
+  return GetArgAsString(1)
+end
+
+Slotnames = {
+  "Helmet",
+  "Breast",
+  "Cloak",
+  "Melee Main Weapon",
+  "Melee Offhand Weapon",
+  "Ranged Main Weapon",
+  "Ranged Offhand Weapon",
+  "Underwear",
+  "Boots",
+  "Gloves",
+  "Amulet",
+  "Ring",
+  "Ring2",
+  "Wings",
+  "Horns",
+  "Overhead",
+  "MusicalInstrument",
+  "VanityBody",
+  "VanityBoots"
+}
+for i = 1, #Slotnames do
+  Slotnames[ Slotnames[i] ] = true
+end
+function GetEquippedItem(Character, Slotname)--: Item
+  if Slotname == nil then
+    Slotname = Character
+    Character = GetHostCharacter()
+  end
+  if Slotname == nil then
+    return nil
+  end
+  if Slotnames[Slotname] ~= true then
+    print("Slotname must be one of the following: " .. table.concat(Slotnames, ", "))
+    return nil
+  end
+  SetArgToString(0, Character)
+  SetArgToString(1, Slotname)
+  ClearArg(2)
+  ExecuteCall("GetEquippedItem")
+  return GetArgAsString(2)
+end
+
+
+
+-- allocate usefull string variables accessable in scripts
+{$asm}
+alloc(m_spellString,$1000)
+registersymbol(m_spellString)
+[DISABLE]
+{$asm}
+unregistersymbol(m_spellString)
+dealloc(m_spellString)
+
+</AssemblerScript>
+            </CheatEntry>
             <CheatEntry>
               <ID>98</ID>
               <Description>"Last Interacted Object"</Description>
