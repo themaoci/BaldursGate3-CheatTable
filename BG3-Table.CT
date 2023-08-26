@@ -3859,12 +3859,27 @@ ExecuteCall("RequestRespec")
                     </CheatEntry>
                     <CheatEntry>
                       <ID>1205</ID>
-                      <Description>"Set Max Party Size Override"</Description>
+                      <Description>"Set Max Party Size Override [size:20]"</Description>
                       <VariableType>Auto Assembler Script</VariableType>
                       <AssemblerScript Async="1">{$lua}
 if syntaxcheck then return end
 [ENABLE]
 SetArgToInteger(0, 20)
+local result = ExecuteCall("SetMaxPartySizeOverride")
+print(result and "First dismiss a party member and then you can add up to 20" or "command failed")
+
+{$asm}
+[DISABLE]
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>104381</ID>
+                      <Description>"Restore Max Party Size"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+SetArgToInteger(0, 4)
 local result = ExecuteCall("SetMaxPartySizeOverride")
 print(result and "First dismiss a party member and then you can add up to 20" or "command failed")
 
@@ -26636,7 +26651,7 @@ end
                         </CheatEntry>
                         <CheatEntry>
                           <ID>104256</ID>
-                          <Description>"Reduce Critical Attack Threshold"</Description>
+                          <Description>"Reduce Critical Attack Threshold (Orin_Bhaalist_Dagger)"</Description>
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript>{$lua}
 if syntaxcheck then return end
@@ -26655,7 +26670,7 @@ end
                         </CheatEntry>
                         <CheatEntry>
                           <ID>104257</ID>
-                          <Description>"Reduce Critical Attack Threshold"</Description>
+                          <Description>"Reduce Critical Attack Threshold (TheClover_Rearrangement)"</Description>
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript>{$lua}
 if syntaxcheck then return end
@@ -26674,7 +26689,7 @@ end
                         </CheatEntry>
                         <CheatEntry>
                           <ID>104258</ID>
-                          <Description>"Reduce Critical Attack Threshold"</Description>
+                          <Description>"Reduce Critical Attack Threshold (Sarevok_HornedHelmet_DeathbringerSight)"</Description>
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript>{$lua}
 if syntaxcheck then return end
@@ -26693,7 +26708,7 @@ end
                         </CheatEntry>
                         <CheatEntry>
                           <ID>104259</ID>
-                          <Description>"Reduce Critical Attack Threshold"</Description>
+                          <Description>"Reduce Critical Attack Threshold (TheDueller_ImprovedDuelist)"</Description>
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript>{$lua}
 if syntaxcheck then return end
@@ -48445,30 +48460,74 @@ TemplateAddToPlayer(items, 1)
                   <GroupHeader>1</GroupHeader>
                   <CheatEntries>
                     <CheatEntry>
-                      <ID>399</ID>
-                      <Description>"Companion Cheats (disabling will reset fields) [2WS]"</Description>
+                      <ID>104382</ID>
+                      <Description>"1. Select Companions You want to change Attitude or Approval"</Description>
+                      <Options moHideChildren="1"/>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>104383</ID>
+                          <Description>"Astarion"</Description>
+                          <GroupHeader>1</GroupHeader>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104390</ID>
+                          <Description>"Gale"</Description>
+                          <GroupHeader>1</GroupHeader>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104389</ID>
+                          <Description>"Halsin"</Description>
+                          <GroupHeader>1</GroupHeader>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104388</ID>
+                          <Description>"Jaheira"</Description>
+                          <GroupHeader>1</GroupHeader>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104387</ID>
+                          <Description>"Karlach"</Description>
+                          <GroupHeader>1</GroupHeader>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104386</ID>
+                          <Description>"Lae'zel"</Description>
+                          <GroupHeader>1</GroupHeader>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104385</ID>
+                          <Description>"Losiir"</Description>
+                          <GroupHeader>1</GroupHeader>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104384</ID>
+                          <Description>"Minsc"</Description>
+                          <GroupHeader>1</GroupHeader>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104391</ID>
+                          <Description>"Minthara"</Description>
+                          <GroupHeader>1</GroupHeader>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104392</ID>
+                          <Description>"Shadowheart"</Description>
+                          <GroupHeader>1</GroupHeader>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104393</ID>
+                          <Description>"Wyll"</Description>
+                          <GroupHeader>1</GroupHeader>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>104394</ID>
+                      <Description>"2. Add/Remove points from selected companions [2WS]"</Description>
                       <Options moHideChildren="1"/>
                       <VariableType>Auto Assembler Script</VariableType>
                       <AssemblerScript Async="1">[ENABLE]
-{$asm}
-alloc(m_MainCharacter,0x512)
-registersymbol(m_MainCharacter)
-
-m_MainCharacter:
- dq "empty"
-
-
-[DISABLE]
-unregistersymbol(m_MainCharacter)
-dealloc(m_MainCharacter)
-</AssemblerScript>
-                      <CheatEntries>
-                        <CheatEntry>
-                          <ID>104302</ID>
-                          <Description>"0. Select your character [2WS] (Character List Script)"</Description>
-                          <Options moHideChildren="1"/>
-                          <VariableType>Auto Assembler Script</VariableType>
-                          <AssemblerScript Async="1">[ENABLE]
 {$lua}
 COMPANION = {}
 COMPANION["shadowheart"] = "3ed74f06-3c60-42dc-83f6-f034cb47c679" -- shadowheart
@@ -48485,516 +48544,259 @@ COMPANIONS[""] = "" --
 
 [DISABLE]
 </AssemblerScript>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>104395</ID>
+                          <Description>"[DEBUG] Get Selected Character UUID [2WS]"</Description>
+                          <Options moHideChildren="1"/>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript Async="1">[ENABLE]
+
+{$asm}
+alloc(m_MainCharacter,0x512)
+registersymbol(m_MainCharacter)
+
+m_MainCharacter:
+ dq "empty"
+
+{$lua}
+if syntaxcheck then return end
+
+local variable = GetHostCharacter()
+writeString("m_MainCharacter", tostring(variable))
+
+[DISABLE]
+{$asm}
+unregistersymbol(m_MainCharacter)
+dealloc(m_MainCharacter)
+</AssemblerScript>
                           <CheatEntries>
                             <CheatEntry>
-                              <ID>104374</ID>
-                              <Description>"Get Selected Character Get UUID"</Description>
+                              <ID>104396</ID>
+                              <Description>"Found Value ===&gt;"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>String</VariableType>
+                              <Length>36</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>m_MainCharacter</Address>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104397</ID>
+                          <Description>"INFO: Make sure your character is selected when clicking scripts below"</Description>
+                          <Color>0000FF</Color>
+                          <GroupHeader>1</GroupHeader>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104398</ID>
+                          <Description>"Add Attitude"</Description>
+                          <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                          <GroupHeader>1</GroupHeader>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>104399</ID>
+                              <Description>"+10 Attitude"</Description>
                               <VariableType>Auto Assembler Script</VariableType>
                               <AssemblerScript Async="1">{$lua}
 if syntaxcheck then return end
 [ENABLE]
-local variable = GetHostCharacter()
-writeString("m_MainCharacter", tostring(variable))
+local companions = GetSelectedCompanionsLikelyHood()
+local characterHost = GetHostCharacter()
+if #companions &gt; 0 then
+   for i=1,#companions do
+      SetArgToString(1, characterHost)
+      SetArgToString(0, companions[i])
+      SetArgToLong(2, 10)
+      ExecuteCall("AddAttitudeTowardsPlayer")
+   end
+else
+ messageDialog("No Companion selected make sure you select at last 1 of them to add attitude or approval to your character on them")
+end
 [DISABLE]
 </AssemblerScript>
-                              <CheatEntries>
-                                <CheatEntry>
-                                  <ID>104375</ID>
-                                  <Description>"Variable Saved"</Description>
-                                  <ShowAsSigned>0</ShowAsSigned>
-                                  <VariableType>String</VariableType>
-                                  <Length>36</Length>
-                                  <Unicode>0</Unicode>
-                                  <CodePage>0</CodePage>
-                                  <ZeroTerminate>1</ZeroTerminate>
-                                  <Address>m_MainCharacter</Address>
-                                </CheatEntry>
-                              </CheatEntries>
                             </CheatEntry>
                             <CheatEntry>
-                              <ID>104376</ID>
-                              <Description>"INFO: Make sure your character is selected when clicking scripts below"</Description>
-                              <Color>0000FF</Color>
+                              <ID>104400</ID>
+                              <Description>"+100 Attitude"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript Async="1">{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local companions = GetSelectedCompanionsLikelyHood()
+local characterHost = GetHostCharacter()
+if #companions &gt; 0 then
+   for i=1,#companions do
+      SetArgToString(1, characterHost)
+      SetArgToString(0, companions[i])
+      SetArgToLong(2, 100)
+      ExecuteCall("AddAttitudeTowardsPlayer")
+   end
+else
+ messageDialog("No Companion selected make sure you select at last 1 of them to add attitude or approval to your character on them")
+end
+[DISABLE]
+</AssemblerScript>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>104401</ID>
+                              <Description>"=============="</Description>
                               <GroupHeader>1</GroupHeader>
                             </CheatEntry>
                             <CheatEntry>
-                              <ID>104339</ID>
-                              <Description>"Companion "Shadowheart""</Description>
-                              <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
-                              <GroupHeader>1</GroupHeader>
-                              <CheatEntries>
-                                <CheatEntry>
-                                  <ID>104340</ID>
-                                  <Description>"+10 Attitude"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
+                              <ID>104402</ID>
+                              <Description>"-10 Attitude"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript Async="1">{$lua}
 if syntaxcheck then return end
 [ENABLE]
-
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["shadowheart"])
-SetArgToLong(2, 10)
-ExecuteCall("AddAttitudeTowardsPlayer")
+local companions = GetSelectedCompanionsLikelyHood()
+local characterHost = GetHostCharacter()
+if #companions &gt; 0 then
+   for i=1,#companions do
+      SetArgToString(1, characterHost)
+      SetArgToString(0, companions[i])
+      SetArgToLong(2, 10)
+      ExecuteCall("AddAttitudeTowardsPlayer")
+   end
+else
+ messageDialog("No Companion selected make sure you select at last 1 of them to add attitude or approval to your character on them")
+end
 [DISABLE]
 </AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104341</ID>
-                                  <Description>"+10 Approval"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["shadowheart"])
-Sleep(5)
-SetArgToLong(2, 0)
-SetArgToLong(3, 100)
-ClearArg(4)
-ExecuteCall("ChangeApprovalRating")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104342</ID>
-                                  <Description>"+100 Attitude"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["shadowheart"])
-SetArgToLong(2, 100)
-ExecuteCall("AddAttitudeTowardsPlayer")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104343</ID>
-                                  <Description>"+100 Approval"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["shadowheart"])
-SetArgToLong(2, 0)
-SetArgToLong(3, 100)
-ClearArg(4)
-ExecuteCall("ChangeApprovalRating")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                              </CheatEntries>
                             </CheatEntry>
                             <CheatEntry>
-                              <ID>104369</ID>
-                              <Description>"Companion "Gale""</Description>
-                              <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
-                              <GroupHeader>1</GroupHeader>
-                              <CheatEntries>
-                                <CheatEntry>
-                                  <ID>104370</ID>
-                                  <Description>"+10 Attitude"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
+                              <ID>104403</ID>
+                              <Description>"-100 Attitude"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript Async="1">{$lua}
 if syntaxcheck then return end
 [ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["gale"])
-SetArgToLong(2, 10)
-ExecuteCall("AddAttitudeTowardsPlayer")
+local companions = GetSelectedCompanionsLikelyHood()
+local characterHost = GetHostCharacter()
+if #companions &gt; 0 then
+   for i=1,#companions do
+      SetArgToString(1, characterHost)
+      SetArgToString(0, companions[i])
+      SetArgToLong(2, 100)
+      ExecuteCall("AddAttitudeTowardsPlayer")
+   end
+else
+ messageDialog("No Companion selected make sure you select at last 1 of them to add attitude or approval to your character on them")
+end
 [DISABLE]
 </AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104371</ID>
-                                  <Description>"+10 Approval"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104404</ID>
+                          <Description>"Add Approval"</Description>
+                          <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                          <GroupHeader>1</GroupHeader>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>104405</ID>
+                              <Description>"+10 Approval"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript Async="1">{$lua}
 if syntaxcheck then return end
 [ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["gale"])
-SetArgToLong(2, 0)
-SetArgToLong(3, 10)
-ClearArg(4)
-ExecuteCall("ChangeApprovalRating")
+local companions = GetSelectedCompanionsLikelyHood()
+local characterHost = GetHostCharacter()
+if #companions &gt; 0 then
+   for i=1,#companions do
+      SetArgToString(1, characterHost)
+      SetArgToString(0, companions[i])
+      SetArgToLong(2, 0)
+      SetArgToLong(3, 10)
+      ClearArg(4)
+      ExecuteCall("ChangeApprovalRating")
+   end
+else
+ messageDialog("No Companion selected make sure you select at last 1 of them to add attitude or approval to your character on them")
+end
 [DISABLE]
 </AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104372</ID>
-                                  <Description>"+100 Attitude"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["gale"])
-SetArgToLong(2, 100)
-ExecuteCall("AddAttitudeTowardsPlayer")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104373</ID>
-                                  <Description>"+100 Approval"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["gale"])
-SetArgToLong(2, 0)
-SetArgToLong(3, 100)
-ClearArg(4)
-ExecuteCall("ChangeApprovalRating")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                              </CheatEntries>
                             </CheatEntry>
                             <CheatEntry>
-                              <ID>104364</ID>
-                              <Description>"Companion "Minthara""</Description>
-                              <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
-                              <GroupHeader>1</GroupHeader>
-                              <CheatEntries>
-                                <CheatEntry>
-                                  <ID>104365</ID>
-                                  <Description>"+10 Attitude"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
+                              <ID>104406</ID>
+                              <Description>"+100 Approval"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript Async="1">{$lua}
 if syntaxcheck then return end
 [ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["minthara"])
-SetArgToLong(2, 10)
-ExecuteCall("AddAttitudeTowardsPlayer")
+local companions = GetSelectedCompanionsLikelyHood()
+local characterHost = GetHostCharacter()
+if #companions &gt; 0 then
+   for i=1,#companions do
+      SetArgToString(1, characterHost)
+      SetArgToString(0, companions[i])
+      SetArgToLong(2, 0)
+      SetArgToLong(3, 100)
+      ClearArg(4)
+      ExecuteCall("ChangeApprovalRating")
+   end
+else
+ messageDialog("No Companion selected make sure you select at last 1 of them to add attitude or approval to your character on them")
+end
 [DISABLE]
 </AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104366</ID>
-                                  <Description>"+10 Approval"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["minthara"])
-SetArgToLong(2, 0)
-SetArgToLong(3, 10)
-ClearArg(4)
-ExecuteCall("ChangeApprovalRating")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104367</ID>
-                                  <Description>"+100 Attitude"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["minthara"])
-SetArgToLong(2, 100)
-ExecuteCall("AddAttitudeTowardsPlayer")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104368</ID>
-                                  <Description>"+100 Approval"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["minthara"])
-SetArgToLong(2, 0)
-SetArgToLong(3, 100)
-ClearArg(4)
-ExecuteCall("ChangeApprovalRating")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                              </CheatEntries>
                             </CheatEntry>
                             <CheatEntry>
-                              <ID>104359</ID>
-                              <Description>"Companion "Astarion""</Description>
-                              <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+                              <ID>104407</ID>
+                              <Description>"=============="</Description>
                               <GroupHeader>1</GroupHeader>
-                              <CheatEntries>
-                                <CheatEntry>
-                                  <ID>104360</ID>
-                                  <Description>"+10 Attitude"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["astarion"])
-SetArgToLong(2, 10)
-ExecuteCall("AddAttitudeTowardsPlayer")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104361</ID>
-                                  <Description>"+10 Approval"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["astarion"])
-SetArgToLong(2, 0)
-SetArgToLong(3, 10)
-ClearArg(4)
-ExecuteCall("ChangeApprovalRating")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104362</ID>
-                                  <Description>"+100 Attitude"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["astarion"])
-SetArgToLong(2, 100)
-ExecuteCall("AddAttitudeTowardsPlayer")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104363</ID>
-                                  <Description>"+100 Approval"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["astarion"])
-SetArgToLong(2, 0)
-SetArgToLong(3, 100)
-ClearArg(4)
-ExecuteCall("ChangeApprovalRating")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                              </CheatEntries>
                             </CheatEntry>
                             <CheatEntry>
-                              <ID>104354</ID>
-                              <Description>"Companion "Lae'Zel""</Description>
-                              <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
-                              <GroupHeader>1</GroupHeader>
-                              <CheatEntries>
-                                <CheatEntry>
-                                  <ID>104355</ID>
-                                  <Description>"+10 Attitude"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
+                              <ID>104408</ID>
+                              <Description>"-10 Approval"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript Async="1">{$lua}
 if syntaxcheck then return end
 [ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["laezel"])
-SetArgToLong(2, 10)
-ExecuteCall("AddAttitudeTowardsPlayer")
+local companions = GetSelectedCompanionsLikelyHood()
+local characterHost = GetHostCharacter()
+if #companions &gt; 0 then
+   for i=1,#companions do
+      SetArgToString(1, characterHost)
+      SetArgToString(0, companions[i])
+      SetArgToLong(2, 0)
+      SetArgToLong(3, -10)
+      ClearArg(4)
+      ExecuteCall("ChangeApprovalRating")
+   end
+else
+ messageDialog("No Companion selected make sure you select at last 1 of them to add attitude or approval to your character on them")
+end
 [DISABLE]
 </AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104356</ID>
-                                  <Description>"+10 Approval"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["laezel"])
-SetArgToLong(2, 0)
-SetArgToLong(3, 10)
-ClearArg(4)
-ExecuteCall("ChangeApprovalRating")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104357</ID>
-                                  <Description>"+100 Attitude"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["laezel"])
-SetArgToLong(2, 100)
-ExecuteCall("AddAttitudeTowardsPlayer")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104358</ID>
-                                  <Description>"+100 Approval"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["laezel"])
-SetArgToLong(2, 0)
-SetArgToLong(3, 100)
-ClearArg(4)
-ExecuteCall("ChangeApprovalRating")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                              </CheatEntries>
                             </CheatEntry>
                             <CheatEntry>
-                              <ID>104349</ID>
-                              <Description>"Companion "Wyll""</Description>
-                              <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
-                              <GroupHeader>1</GroupHeader>
-                              <CheatEntries>
-                                <CheatEntry>
-                                  <ID>104350</ID>
-                                  <Description>"+10 Attitude"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
+                              <ID>104409</ID>
+                              <Description>"-100 Approval"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript Async="1">{$lua}
 if syntaxcheck then return end
 [ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["wyll"])
-SetArgToLong(2, 10)
-ExecuteCall("AddAttitudeTowardsPlayer")
+local companions = GetSelectedCompanionsLikelyHood()
+local characterHost = GetHostCharacter()
+if #companions &gt; 0 then
+   for i=1,#companions do
+      SetArgToString(1, characterHost)
+      SetArgToString(0, companions[i])
+      SetArgToLong(2, 0)
+      SetArgToLong(3, -100)
+      ClearArg(4)
+      ExecuteCall("ChangeApprovalRating")
+   end
+else
+ messageDialog("No Companion selected make sure you select at last 1 of them to add attitude or approval to your character on them")
+end
 [DISABLE]
 </AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104351</ID>
-                                  <Description>"+10 Approval"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["wyll"])
-SetArgToLong(2, 0)
-SetArgToLong(3, 10)
-ClearArg(4)
-ExecuteCall("ChangeApprovalRating")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104352</ID>
-                                  <Description>"+100 Attitude"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["wyll"])
-SetArgToLong(2, 100)
-ExecuteCall("AddAttitudeTowardsPlayer")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104353</ID>
-                                  <Description>"+100 Approval"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["wyll"])
-SetArgToLong(2, 0)
-SetArgToLong(3, 100)
-ClearArg(4)
-ExecuteCall("ChangeApprovalRating")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                              </CheatEntries>
-                            </CheatEntry>
-                            <CheatEntry>
-                              <ID>104344</ID>
-                              <Description>"Companion "Karlach""</Description>
-                              <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
-                              <GroupHeader>1</GroupHeader>
-                              <CheatEntries>
-                                <CheatEntry>
-                                  <ID>104345</ID>
-                                  <Description>"+10 Attitude"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["karlach"])
-SetArgToLong(2, 10)
-ExecuteCall("AddAttitudeTowardsPlayer")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104346</ID>
-                                  <Description>"+10 Approval"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["karlach"])
-SetArgToLong(2, 0)
-SetArgToLong(3, 10)
-ClearArg(4)
-ExecuteCall("ChangeApprovalRating")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104347</ID>
-                                  <Description>"+100 Attitude"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["karlach"])
-SetArgToLong(2, 100)
-ExecuteCall("AddAttitudeTowardsPlayer")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                                <CheatEntry>
-                                  <ID>104348</ID>
-                                  <Description>"+100 Approval"</Description>
-                                  <VariableType>Auto Assembler Script</VariableType>
-                                  <AssemblerScript Async="1">{$lua}
-if syntaxcheck then return end
-[ENABLE]
-SetArgToString(1, GetHostCharacter())
-SetArgToString(0, COMPANION["karlach"])
-SetArgToLong(2, 0)
-SetArgToLong(3, 100)
-ClearArg(4)
-ExecuteCall("ChangeApprovalRating")
-[DISABLE]
-</AssemblerScript>
-                                </CheatEntry>
-                              </CheatEntries>
                             </CheatEntry>
                           </CheatEntries>
                         </CheatEntry>
