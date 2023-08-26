@@ -6,8 +6,9 @@ Note: Before enabling Register Commands, you must first load your saved game.
 **Desclaimer: Features are not properly named below yet will do that later**
 Features:
 - Automatically attaching to proper game process (this option is auto enabled)
-- Reattach script
+- Reattach script (on script activate)
 - Compact mode (removes the top area where you searches for addresses etc.)
+- Settings (Table): enable/disable autoattach and 1/2WayScript 
 - Executable edits:
  - Last Item Moved (for quantity)
  - Last item Equiped/Dropped (for UUID) (requires console commands to get item template id)
@@ -18,31 +19,99 @@ Features:
  - Learn Any Wizard Scroll (must always be activate BEFORE loading saves)
 
 - Console Commands: 
- - Rest Anywhere
- - Add Gold
- - Add Experience
- - Respec Character
- - Max Ability Stats
- - Extra Max Health
- - Extra Armor
- - Add All Resistance
- - Immune to Status Effects
- - Super Jump
- - Unlimited Movement
- - Unlimited Action Points
- - Unlimited Spell Slots
- - Unlimited Warlock Spell Slots
- - Unlimited Sorcery Points
- - Increase Carry Capacity
- - Add Permanent Tags to Player: Pet Pal, Comprehend Languages, Detect Thoughts, Hermit, Urchin
- - Add Spells
- - Dark Vision
- - Toggle Fog of War
- - Item Spawner (sometimes game crashes so save game after each use)
- - Multiple Companions Attitude/Approval
+  - Character Resource Cheats
+    - Temporary
+	- Unlimited
+	- Boosters
+  - On Demand Cheats
+    - Restore Party
+	- Reset Cooldowns
+	- Restore Action Points
+	- Add Gold (with few variations)
+	- Add Experience (with few variations)
+	- Add 1 Inspiration to selected Character
+	- Add 1 Tadpole
+	- Respec Selected Character (Withers script)
+	- Set Max Party in Overdrive (to 20 slots)
+	- Restore Max Party size (set it back to 4)
+	- Transform into Mind Flayer (more uuid's to transform to inside this script)
+  - Movement Cheats
+    - Set Jump Distance to 5 Times
+	- Set Jump Distance to 20 Times
+	- No Fall Damage
+	- Unlimited Movement
+	- Increase Carry Capacity (x1000)
+	- Extra Movement +100
+	- Extra Movement +500
+	- Extra Movement +2000
+  - Passive/Feat Cheats
+    - Basic Ones (ones that are mostly used)
+	- ALL (all possible ones but you need to add a "remove" function to them then work only like ADD not remove)
+  - Combat Passives
+    - Healing Passives
+	  - Drink Blood from Surfaces
+	  - Heal On Melee Attack
+	  - Maximize Healing
+	- Critical Hit Passives
+	  - Improved Critical Hit
+	  - Reduce Critical Attack Threshold (Orin_Bhaalist_Dagger)
+	  - Reduce Critical Attack Threshold (TheClover_Rearrangement)
+	  - Reduce Critical Attack Threshold (Sarevok_HornedHelmet_DeathbringerSight)
+	  - Reduce Critical Attack Threshold (TheDueller_ImprovedDuelist)
+	  - Covert Critical (While Obscured)
+	  - Skilled Skullduggery (While Stealthed)
+	  - Always Crit When Below 40% Hitpoints
+	- Combat Passives
+	  - Automatically Revive When Downed
+	  - Evade Area Damage
+	  - Improved Bardic Inspiration (+1 Attack Roll)
+	  - Unnatural Growth (+1 Action Point)
+	  - Cold Damage Creates Ice Surface
+	  - Disengage Drops Fog Cloud
+	  - Difficult Terrain Immunity
+	  - Bloodfeeder (On Kill)
+	  - Invisibility On Kill
+	  - Aura of Murder Passive
+	  - Ranged Attack Roll Bonus
+	  - Increased Initiative
+	- Attack Passives
+	  - Infernal Acuity (+1 Attack Roll)
+	  - +2 Attack Roll; +2 Damage
+	  - +2 Attack Roll
+	  - +1 Attack Roll
+	  - +2 Attack Roll When Hurt
+	  - +1D4 Attack Roll (When Hurt)
+	  - Advantage Against Wet Targets (...that's what she said)
+	  - Attacks Gain Knockback
+	  - Tippler's Rage
+	  - Ignore Physical Resistances
+	- Ranged Attack Passives
+	  - Double Ranged Proficiency Bonus
+	  - Ranged Attacks Apply Bane
+	  - Ranged Attacks Turn Undead
+	  - Darkveil Precision (+1D4 Ranged Attack Rolls While Obscured)
+	- Throw Weapon Passives
+	  - Dagger Thrower (+8 Throw Damage)
+	  - Kushigo's Might (+1D4 Throw Damage)
+	  - Throwing Boost (+1D4 Throw Damage)
+  - Spell Cheats
+    - Passives
+	- Resource Passives
+  - Dice Roll Cheats
+  - Permanent Cheats (old scripts)
+  - Random Cheats
+  - Character Tags
+  - Set Flags
+  - Temporary Cheats
+  - Item Spawner
+    - tons of eqiopment grouped in different "folders/tabs"
+  - Companion Cheats Attitude/Approval
+  - Weapon Passive Enchantments
+  - Weapon Enchantments
+  - Last Trade Vendor [2WS]
+  - Testing Stuff (example scripts) 
  
  
- 
-Credits to: Zanzer, Cidrow, Quan lee, Thekross, Avike, TheMaoci
+**Credits to: Zanzer, Cidrow, Quan lee, Thekross, Avike, TheMaoci**
 
 Link: https://fearlessrevolution.com/viewtopic.php?p=311856#p311856
