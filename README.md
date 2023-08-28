@@ -117,7 +117,7 @@ _Manually_
   - Companion Cheats Attitude/Approval
   - Weapon Passive Enchantments
   - Weapon Enchantments
-  - Last Trade Vendor [2WS]
+  - Last Trade Vendor
   - Testing Stuff (example scripts) 
   
   
