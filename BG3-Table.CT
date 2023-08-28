@@ -4,7 +4,7 @@
     <CheatEntry>
       <ID>4762</ID>
       <Description>"--- TABLE ---"</Description>
-      <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
+      <Options moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
       <GroupHeader>1</GroupHeader>
       <CheatEntries>
         <CheatEntry>
@@ -1916,8 +1916,7 @@ bg3.exe+21CE3A6: 48 3B DD        - cmp rbx,rbp
         </CheatEntry>
         <CheatEntry>
           <ID>347</ID>
-          <Description>"Console Commands [2WS]"</Description>
-          <Options moHideChildren="1"/>
+          <Description>"Console Commands [2WS] (enable b4 reloading you game save)"</Description>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript Async="1">[ENABLE]
 aobscanmodule(console,$process,81 E2 FF FF FF 01 3B)
@@ -2051,7 +2050,35 @@ bg3.exe+2F153EC: CC                 - int 3
               <GroupHeader>1</GroupHeader>
             </CheatEntry>
             <CheatEntry>
-              <ID>348</ID>
+              <ID>104414</ID>
+              <Description>"console"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Array of byte</VariableType>
+              <ByteLength>10</ByteLength>
+              <Address>console</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>104415</ID>
+              <Description>"cmdList"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Array of byte</VariableType>
+              <ByteLength>10</ByteLength>
+              <Address>cmdList</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>104416</ID>
+              <Description>"Size"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>cmdList</Address>
+              <Offsets>
+                <Offset>0x2C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>104411</ID>
               <Description>"Commands List (is this populated?)"</Description>
               <ShowAsSigned>0</ShowAsSigned>
               <GroupHeader>1</GroupHeader>
@@ -2077,6 +2104,7 @@ if ConsoleCommands.Active == false then
 end
 
 local commands = readPointer("cmdList")
+print(commands)
 if commands == 0 then
   print("plaese load a saved game first")
   return
@@ -3980,6 +4008,17 @@ AddBoostsToPlayer("JumpMaxDistanceMultiplier(5)")
 if syntaxcheck then return end
 [ENABLE]
 AddBoostsToPlayer("JumpMaxDistanceMultiplier(20)")
+[DISABLE]
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>104421</ID>
+                      <Description>"Set Jump Distance to 1000 Times"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+AddBoostsToPlayer("JumpMaxDistanceMultiplier(1000)")
 [DISABLE]
 </AssemblerScript>
                     </CheatEntry>
@@ -30035,6 +30074,20 @@ TemplateAddToPlayer(item, 1)
                       <CheatEntries>
                         <CheatEntry>
                           <ID>360</ID>
+                          <Description>"Milk"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local item = {
+ "83133248-3c85-4b6d-adf3-2c6985146875",
+}
+TemplateAddToPlayer(item, 1)
+[DISABLE]
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104422</ID>
                           <Description>"Basket of equipment amulet"</Description>
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript>{$lua}
@@ -30049,6 +30102,20 @@ TemplateAddToPlayer(item, 1)
                         </CheatEntry>
                         <CheatEntry>
                           <ID>104378</ID>
+                          <Description>"QUEST_FOR_OwlbearEgg"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local item = {
+ "QUEST_FOR_OwlbearEgg",
+}
+TemplateAddToPlayer(item, 1)
+[DISABLE]
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>104410</ID>
                           <Description>"OBJ_Oil_Of_The_Basilisk"</Description>
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript>{$lua}
@@ -52047,22 +52114,37 @@ bg3.exe+492BC7D: 48 89 44 24 48        - mov [rsp+48],rax
               <Description>"Console Commands OLD"</Description>
               <VariableType>Auto Assembler Script</VariableType>
               <AssemblerScript>[ENABLE]
-aobscanmodule(cmdPtr,$process,48 8B 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 41 B0)
-alloc(cmdCode,0x4096,cmdPtr)
-alloc(cmdStr0,0x512)
-alloc(cmdStr1,0x512)
-alloc(cmdStr2,0x512)
-alloc(cmdStr3,0x512)
-alloc(cmdStr4,0x512)
+aobscanmodule(console,$process,81 E2 FF FF FF 01 3B)
+alloc(newmem,$1000,console)
+alloc(cmdCode,$1000)
+alloc(cmdStr0,$1000)
+alloc(cmdStr1,$1000)
+alloc(cmdStr2,$1000)
+alloc(cmdStr3,$1000)
+alloc(cmdStr4,$1000)
 
-label(cmdList)
 label(cmdCall)
 label(cmdArgs)
 label(cmdSelf)
 label(cmdAddr)
+label(cmdList)
+label(code)
+label(return)
 
-cmdPtr+(DWORD)[cmdPtr+03]+07:
+newmem:
+  mov rax,cmdList
+  mov [rax],rcx
+code:
+  and edx,01FFFFFF
+  jmp return
+
 cmdList:
+  dq 0
+
+console:
+  jmp newmem
+  nop
+return:
 
 cmdCode:
 align 10
@@ -52096,6 +52178,7 @@ cmdArgs:
   dq 0
   dq 0
 
+registersymbol(console)
 registersymbol(cmdList)
 registersymbol(cmdCall)
 registersymbol(cmdAddr)
@@ -52107,11 +52190,12 @@ registersymbol(cmdStr2)
 registersymbol(cmdStr3)
 registersymbol(cmdStr4)
 
-{$lua}
-local registerConsole = getAddressList().getMemoryRecordByID(357)
-registerConsole.Active = true
-
 [DISABLE]
+console:
+  db 81 E2 FF FF FF 01
+unregistersymbol(console)
+dealloc(newmem)
+
 unregistersymbol(cmdList)
 unregistersymbol(cmdCode)
 unregistersymbol(cmdStr0)
@@ -52127,59 +52211,31 @@ dealloc(cmdStr3)
 dealloc(cmdStr4)
 
 {
-// ORIGINAL CODE - INJECTION POINT: bg3.exe+53DD790
+// ORIGINAL CODE - INJECTION POINT: bg3.exe+2F153D3
 
-bg3.exe+53DD766: 74 34                    - je bg3.exe+53DD79C
-bg3.exe+53DD768: 48 8D 05 71 6F E6 04     - lea rax,[bg3.exe+A2446E0]
-bg3.exe+53DD76F: 48 89 44 24 38           - mov [rsp+38],rax
-bg3.exe+53DD774: C7 44 24 40 01 00 00 00  - mov [rsp+40],00000001
-bg3.exe+53DD77C: 48 8D 54 24 38           - lea rdx,[rsp+38]
-bg3.exe+53DD781: 48 8D 4D 00              - lea rcx,[rbp+00]
-bg3.exe+53DD785: E8 F6 E7 CF 02           - call bg3.exe+80DBF80
-bg3.exe+53DD78A: 85 C0                    - test eax,eax
-bg3.exe+53DD78C: 75 0E                    - jne bg3.exe+53DD79C
-bg3.exe+53DD78E: 33 D2                    - xor edx,edx
+bg3.exe+2F153B7: 75 0A              - jne bg3.exe+2F153C3
+bg3.exe+2F153B9: 48 8B 4F 10        - mov rcx,[rdi+10]
+bg3.exe+2F153BD: FF 15 85 08 97 01  - call qword ptr [bg3.exe+4885C48]
+bg3.exe+2F153C3: 48 8B 5C 24 30     - mov rbx,[rsp+30]
+bg3.exe+2F153C8: 48 83 C4 20        - add rsp,20
+bg3.exe+2F153CC: 5F                 - pop rdi
+bg3.exe+2F153CD: C3                 - ret
+bg3.exe+2F153CE: CC                 - int 3
+bg3.exe+2F153CF: CC                 - int 3
+bg3.exe+2F153D0: C1 EA 03           - shr edx,03
 // ---------- INJECTING HERE ----------
-bg3.exe+53DD790: 48 8B 0D 29 BF 73 06     - mov rcx,[bg3.exe+BB196C0]
+bg3.exe+2F153D3: 81 E2 FF FF FF 01  - and edx,01FFFFFF
 // ---------- DONE INJECTING  ----------
-bg3.exe+53DD797: E8 A4 15 36 FE           - call bg3.exe+373ED40
-bg3.exe+53DD79C: 48 8B 0D A5 BE 73 06     - mov rcx,[bg3.exe+BB19648]
-bg3.exe+53DD7A3: E8 A8 C9 2E FE           - call bg3.exe+36CA150
-bg3.exe+53DD7A8: 41 B0 01                 - mov r8l,01
-bg3.exe+53DD7AB: 48 8B D7                 - mov rdx,rdi
-bg3.exe+53DD7AE: 48 8B 0D 93 BE 73 06     - mov rcx,[bg3.exe+BB19648]
-bg3.exe+53DD7B5: E8 96 C6 2E FE           - call bg3.exe+36C9E50
-bg3.exe+53DD7BA: 48 8B D7                 - mov rdx,rdi
-bg3.exe+53DD7BD: 48 8B 0D 44 BE 73 06     - mov rcx,[bg3.exe+BB19608]
-bg3.exe+53DD7C4: E8 17 1A 6B 02           - call bg3.exe+7A8F1E0
-}
-
-{
-// ORIGINAL CODE - INJECTION POINT: "bg3.exe"+1E263F8
-
-"bg3.exe"+1E263CA: 48 81 C1 00 01 00 00  -  add rcx,00000100
-"bg3.exe"+1E263D1: 48 8B EA              -  mov rbp,rdx
-"bg3.exe"+1E263D4: E8 C7 56 5D 00        -  call bg3.exe+23FBAA0
-"bg3.exe"+1E263D9: 45 33 C0              -  xor r8d,r8d
-"bg3.exe"+1E263DC: 48 8D 8B C8 00 00 00  -  lea rcx,[rbx+000000C8]
-"bg3.exe"+1E263E3: 48 8B D5              -  mov rdx,rbp
-"bg3.exe"+1E263E6: E8 F5 D1 5C 00        -  call bg3.exe+23F35E0
-"bg3.exe"+1E263EB: 45 33 C0              -  xor r8d,r8d
-"bg3.exe"+1E263EE: 48 8D 8B 30 01 00 00  -  lea rcx,[rbx+00000130]
-"bg3.exe"+1E263F5: 48 8B D5              -  mov rdx,rbp
-// ---------- INJECTING HERE ----------
-"bg3.exe"+1E263F8: E8 73 8A 5D 00        -  call bg3.exe+23FEE70
-// ---------- DONE INJECTING  ----------
-"bg3.exe"+1E263FD: 48 8B 0D 84 7E D2 03  -  mov rcx,[bg3.exe+5B4E288]
-"bg3.exe"+1E26404: E8 C7 21 25 00        -  call bg3.exe+20785D0
-"bg3.exe"+1E26409: 41 B0 01              -  mov r8l,01
-"bg3.exe"+1E2640C: 48 8D 8B 00 01 00 00  -  lea rcx,[rbx+00000100]
-"bg3.exe"+1E26413: 48 8B D5              -  mov rdx,rbp
-"bg3.exe"+1E26416: E8 85 56 5D 00        -  call bg3.exe+23FBAA0
-"bg3.exe"+1E2641B: 41 B0 01              -  mov r8l,01
-"bg3.exe"+1E2641E: 48 8D 8B C8 00 00 00  -  lea rcx,[rbx+000000C8]
-"bg3.exe"+1E26425: 48 8B D5              -  mov rdx,rbp
-"bg3.exe"+1E26428: E8 B3 D1 5C 00        -  call bg3.exe+23F35E0
+bg3.exe+2F153D9: 3B 51 2C           - cmp edx,[rcx+2C]
+bg3.exe+2F153DC: 73 09              - jae bg3.exe+2F153E7
+bg3.exe+2F153DE: 48 8B 41 20        - mov rax,[rcx+20]
+bg3.exe+2F153E2: 48 8B 04 D0        - mov rax,[rax+rdx*8]
+bg3.exe+2F153E6: C3                 - ret
+bg3.exe+2F153E7: 33 C0              - xor eax,eax
+bg3.exe+2F153E9: C3                 - ret
+bg3.exe+2F153EA: CC                 - int 3
+bg3.exe+2F153EB: CC                 - int 3
+bg3.exe+2F153EC: CC                 - int 3
 }
 </AssemblerScript>
             </CheatEntry>
@@ -55971,6 +56027,42 @@ bg3.exe+10D47E6: 48 8D 4C 24 48        - lea rcx,[rsp+48]
           </CheatEntries>
         </CheatEntry>
       </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>104417</ID>
+      <Description>"No description"</Description>
+      <ShowAsHex>1</ShowAsHex>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>Array of byte</VariableType>
+      <ByteLength>8</ByteLength>
+      <Address>16DB52A9A1C</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>104418</ID>
+      <Description>"No description"</Description>
+      <ShowAsHex>1</ShowAsHex>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>Array of byte</VariableType>
+      <ByteLength>8</ByteLength>
+      <Address>16D9ACBD147</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>104419</ID>
+      <Description>"No description"</Description>
+      <ShowAsHex>1</ShowAsHex>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>Array of byte</VariableType>
+      <ByteLength>8</ByteLength>
+      <Address>16CA6F4C626</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>104420</ID>
+      <Description>"No description"</Description>
+      <ShowAsHex>1</ShowAsHex>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>Array of byte</VariableType>
+      <ByteLength>8</ByteLength>
+      <Address>16C9F3E0FCA</Address>
     </CheatEntry>
   </CheatEntries>
   <UserdefinedSymbols>
