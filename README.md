@@ -3,7 +3,7 @@ Cheat engine table for game Baldur's Gate 3
   
 ## HOW TO DOWNLOAD table
   
-_Direct Link (always newest)_
+_Direct Link (always newest)_  
 [Download using minhaskamal DownGit](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/themaoci/BaldursGate3-CheatTable/blob/main/BG3-Table.CT)
   
 _Manually_
@@ -13,7 +13,7 @@ _Manually_
   
 ## Features
   
-**Note: Enable Console commands in main menu then Register commands when in loaded game**
+**Note: Enable Console commands in main menu then Register commands when in loaded game**  
 Features:  
 - Automatically attaching to proper game process (this option is auto enabled)
 - Reattach script (on script activate)
