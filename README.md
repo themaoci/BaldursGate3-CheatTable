@@ -1,23 +1,32 @@
 # BaldursGate3-CheatTable
 Cheat engine table for game Baldur's Gate 3
-
-Note: Before enabling Register Commands, you must first load your saved game.
-
-**Desclaimer: Features are not properly named below yet will do that later**
-Features:
+  
+## HOW TO DOWNLOAD table
+  
+_Direct Link (always newest)_
+[Download using minhaskamal DownGit](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/themaoci/BaldursGate3-CheatTable/blob/main/BG3-Table.CT)
+  
+_Manually_
+- click file: BG3-Table.CT
+- on top bar of the opened file on the right side next to "Raw" and Copy icon there is download icon
+- file will be downloaded after clicking it
+  
+## Features
+  
+**Note: Enable Console commands in main menu then Register commands when in loaded game**
+Features:  
 - Automatically attaching to proper game process (this option is auto enabled)
 - Reattach script (on script activate)
 - Compact mode (removes the top area where you searches for addresses etc.)
 - Settings (Table): enable/disable autoattach and 1/2WayScript 
 - Executable edits:
- - Last Item Moved (for quantity)
- - Last item Equiped/Dropped (for UUID) (requires console commands to get item template id)
- - Edit Stat Points (save game required) (2 different scripts for this)
- - Unlimited Prepared Spells
- - Force a Level Up When You Save
- - No Weight
- - Learn Any Wizard Scroll (must always be activate BEFORE loading saves)
-
+  - Last Item Moved (for quantity)
+  - Last item Equiped/Dropped (for UUID) (requires console commands to get item template id)
+  - Edit Stat Points (save game required) (2 different scripts for this)
+  - Unlimited Prepared Spells
+  - Force a Level Up When You Save
+  - No Weight
+  - Learn Any Wizard Scroll (must always be activate BEFORE loading saves)
 - Console Commands: 
   - Character Resource Cheats
     - Temporary
@@ -110,8 +119,9 @@ Features:
   - Weapon Enchantments
   - Last Trade Vendor [2WS]
   - Testing Stuff (example scripts) 
- 
- 
-**Credits to: Zanzer, Cidrow, Quan lee, Thekross, Avike, TheMaoci**
-
+  
+  
+## Credits
+**Zanzer, Cidrow, Quan lee, Thekross, Avike, TheMaoci**
+  
 Link: https://fearlessrevolution.com/viewtopic.php?p=311856#p311856
