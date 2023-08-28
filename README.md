@@ -14,7 +14,7 @@ _Manually_
 ## Features
   
 **Note: Enable Console commands in main menu then Register commands when in loaded game**  
-Features:  
+  
 - Automatically attaching to proper game process (this option is auto enabled)
 - Reattach script (on script activate)
 - Compact mode (removes the top area where you searches for addresses etc.)
@@ -113,7 +113,7 @@ Features:
   - Set Flags
   - Temporary Cheats
   - Item Spawner
-    - tons of eqiopment grouped in different "folders/tabs"
+    - tons of equipment grouped in different "folders/tabs"
   - Companion Cheats Attitude/Approval
   - Weapon Passive Enchantments
   - Weapon Enchantments
