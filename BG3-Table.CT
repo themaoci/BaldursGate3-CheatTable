@@ -9,6 +9,76 @@
       <CheatEntries>
         <CheatEntry>
           <ID>5542</ID>
+          <Description>"Dark Mode (Cheat Engine) [2WS] by TheMaoci"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{$LUA}
+function fixFontColor(c, newColor)
+  local i
+  if c.Font then
+    c.Font.Color=newColor
+  end
+  for i=0,c.ComponentCount-1 do
+    fixFontColor(c.Component[i], newColor)
+  end
+end
+function fixFontColorForRecords(newColor)
+  local whiteOrBlack = clWhite
+  if newColor == clWhite then
+     whiteOrBlack = clBlack
+  end
+  local list = getAddressList()
+  local count = list.getCount()
+  for i=0, count-1 do
+      local record = list.getMemoryRecord(i)
+      if record.Color == whiteOrBlack then
+         record.Color = newColor
+      end
+  end
+end
+
+function fixFormColors(newColor)
+  local whiteOrBlack = clWhite
+  if newColor == clWhite then
+     whiteOrBlack = clBlack
+  end
+  local mainForm = getMainForm()
+  local addressList = GetAddressList()
+  for i=0, getFormCount() do
+     local form = getForm(i)
+     if form ~= nil then
+        form.Color = newColor
+        form.Font.Color=whiteOrBlack
+     end
+  end
+  mainForm.color=newColor
+  mainForm.Font.Color=whiteOrBlack
+  for j=0, #addressList.Control do
+    if addressList.Control[j] ~= nil then
+      addressList.Control[j].BackgroundColor=newColor
+      addressList.Control[j].Font.Color=whiteOrBlack
+    end
+  end
+end
+
+{$ASM}
+[ENABLE]
+{$LUA}
+
+fixFontColor(getMainForm(), clWhite)
+fixFontColorForRecords(clBlack)
+fixFormColors(clWhite)
+{$ASM}
+[DISABLE]
+{$LUA}
+
+fixFontColor(getMainForm(), clBlack)
+fixFontColorForRecords(clWhite)
+fixFormColors(clBlack)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>104423</ID>
           <Description>"Compact Mode (Cheat Engine) [2WS]"</Description>
           <Options moHideChildren="1"/>
           <VariableType>Auto Assembler Script</VariableType>
@@ -2069,23 +2139,12 @@ bg3.exe+2F153EC: CC                 - int 3
             </CheatEntry>
             <CheatEntry>
               <ID>104416</ID>
-              <Description>"Size"</Description>
+              <Description>"Size (Should be between 1200-1300)"</Description>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>cmdList</Address>
               <Offsets>
                 <Offset>0x2C</Offset>
-              </Offsets>
-            </CheatEntry>
-            <CheatEntry>
-              <ID>104411</ID>
-              <Description>"Commands List (is this populated?)"</Description>
-              <ShowAsSigned>0</ShowAsSigned>
-              <GroupHeader>1</GroupHeader>
-              <Address>cmdList</Address>
-              <Offsets>
-                <Offset>0</Offset>
-                <Offset>10</Offset>
               </Offsets>
             </CheatEntry>
             <CheatEntry>
@@ -56027,42 +56086,6 @@ bg3.exe+10D47E6: 48 8D 4C 24 48        - lea rcx,[rsp+48]
           </CheatEntries>
         </CheatEntry>
       </CheatEntries>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>104417</ID>
-      <Description>"No description"</Description>
-      <ShowAsHex>1</ShowAsHex>
-      <ShowAsSigned>0</ShowAsSigned>
-      <VariableType>Array of byte</VariableType>
-      <ByteLength>8</ByteLength>
-      <Address>16DB52A9A1C</Address>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>104418</ID>
-      <Description>"No description"</Description>
-      <ShowAsHex>1</ShowAsHex>
-      <ShowAsSigned>0</ShowAsSigned>
-      <VariableType>Array of byte</VariableType>
-      <ByteLength>8</ByteLength>
-      <Address>16D9ACBD147</Address>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>104419</ID>
-      <Description>"No description"</Description>
-      <ShowAsHex>1</ShowAsHex>
-      <ShowAsSigned>0</ShowAsSigned>
-      <VariableType>Array of byte</VariableType>
-      <ByteLength>8</ByteLength>
-      <Address>16CA6F4C626</Address>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>104420</ID>
-      <Description>"No description"</Description>
-      <ShowAsHex>1</ShowAsHex>
-      <ShowAsSigned>0</ShowAsSigned>
-      <VariableType>Array of byte</VariableType>
-      <ByteLength>8</ByteLength>
-      <Address>16C9F3E0FCA</Address>
     </CheatEntry>
   </CheatEntries>
   <UserdefinedSymbols>
