@@ -1916,7 +1916,7 @@ bg3.exe+21CE3A6: 48 3B DD        - cmp rbx,rbp
         </CheatEntry>
         <CheatEntry>
           <ID>347</ID>
-          <Description>"Console Commands [2WS] (enable b4 reloading you game save)"</Description>
+          <Description>"Console Commands [2WS] (ENABLE IN MAIN MENU)"</Description>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript Async="1">[ENABLE]
 aobscanmodule(console,$process,81 E2 FF FF FF 01 3B)
@@ -2090,7 +2090,7 @@ bg3.exe+2F153EC: CC                 - int 3
             </CheatEntry>
             <CheatEntry>
               <ID>357</ID>
-              <Description>"Register Commands [2WS]"</Description>
+              <Description>"Register Commands [2WS] (ENABLE AFTER GAME IS LOADED)"</Description>
               <Options moHideChildren="1"/>
               <VariableType>Auto Assembler Script</VariableType>
               <AssemblerScript Async="1">[ENABLE]
@@ -26671,7 +26671,7 @@ end
                       <CheatEntries>
                         <CheatEntry>
                           <ID>104255</ID>
-                          <Description>"Improved Critical Hit"</Description>
+                          <Description>"Improved Critical Hit [2WS]"</Description>
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript>{$lua}
 if syntaxcheck then return end
@@ -26690,7 +26690,7 @@ end
                         </CheatEntry>
                         <CheatEntry>
                           <ID>104256</ID>
-                          <Description>"Reduce Critical Attack Threshold (Orin_Bhaalist_Dagger)"</Description>
+                          <Description>"Reduce Critical Attack Threshold (Orin_Bhaalist_Dagger) [2WS]"</Description>
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript>{$lua}
 if syntaxcheck then return end
@@ -26709,7 +26709,7 @@ end
                         </CheatEntry>
                         <CheatEntry>
                           <ID>104257</ID>
-                          <Description>"Reduce Critical Attack Threshold (TheClover_Rearrangement)"</Description>
+                          <Description>"Reduce Critical Attack Threshold (TheClover_Rearrangement) [2WS]"</Description>
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript>{$lua}
 if syntaxcheck then return end
@@ -26728,7 +26728,7 @@ end
                         </CheatEntry>
                         <CheatEntry>
                           <ID>104258</ID>
-                          <Description>"Reduce Critical Attack Threshold (Sarevok_HornedHelmet_DeathbringerSight)"</Description>
+                          <Description>"Reduce Critical Attack Threshold (Sarevok_HornedHelmet_DeathbringerSight) [2WS]"</Description>
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript>{$lua}
 if syntaxcheck then return end
@@ -26747,7 +26747,7 @@ end
                         </CheatEntry>
                         <CheatEntry>
                           <ID>104259</ID>
-                          <Description>"Reduce Critical Attack Threshold (TheDueller_ImprovedDuelist)"</Description>
+                          <Description>"Reduce Critical Attack Threshold (TheDueller_ImprovedDuelist) [2WS]"</Description>
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript>{$lua}
 if syntaxcheck then return end
@@ -26766,7 +26766,7 @@ end
                         </CheatEntry>
                         <CheatEntry>
                           <ID>104260</ID>
-                          <Description>"Covert Critical (While Obscured)"</Description>
+                          <Description>"Covert Critical (While Obscured) [2WS]"</Description>
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript>{$lua}
 if syntaxcheck then return end
@@ -26785,7 +26785,7 @@ end
                         </CheatEntry>
                         <CheatEntry>
                           <ID>104261</ID>
-                          <Description>"Skilled Skullduggery (While Stealthed)"</Description>
+                          <Description>"Skilled Skullduggery (While Stealthed) [2WS]"</Description>
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript>{$lua}
 if syntaxcheck then return end
@@ -26804,7 +26804,7 @@ end
                         </CheatEntry>
                         <CheatEntry>
                           <ID>104262</ID>
-                          <Description>"Always Crit When Below 40% Hitpoints"</Description>
+                          <Description>"Always Crit When Below 40% Hitpoints [2WS]"</Description>
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript>{$lua}
 if syntaxcheck then return end
