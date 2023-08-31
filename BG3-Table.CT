@@ -8,7 +8,7 @@
       <GroupHeader>1</GroupHeader>
       <CheatEntries>
         <CheatEntry>
-          <ID>5542</ID>
+          <ID>104424</ID>
           <Description>"Dark Mode (Cheat Engine) [2WS] by TheMaoci"</Description>
           <Options moHideChildren="1"/>
           <VariableType>Auto Assembler Script</VariableType>
@@ -2158,13 +2158,12 @@ bg3.exe+2F153EC: CC                 - int 3
 if syntaxcheck then return end
 
 local ConsoleCommands = getAddressList().getMemoryRecordByID(347)
-if ConsoleCommands.Active == false then
+if ConsoleCommands.Active and true or false then
    ConsoleCommands.Active = true
    Sleep(500)
 end
 
 local commands = readPointer("cmdList")
-print(commands)
 if commands == 0 then
   print("plaese load a saved game first")
   return
@@ -56098,7 +56097,9 @@ bg3.exe+10D47E6: 48 8D 4C 24 48        - lea rcx,[rsp+48]
   <LuaScript>local al = getAddressList()
 EnableAutoScriptDisabler = al.getMemoryRecordByID(4780)
 KeepReattaching = al.getMemoryRecordByID(5519)
-
+field_ConsoleCommands = al.getMemoryRecordByID(347)
+field_RegisterCommands = al.getMemoryRecordByID(357)
+field_CommandListSize = al.getMemoryRecordByID(104416)
 -- SETTINGS --
 EnableAutoScriptDisabler.Active = true
 KeepReattaching.Active = true
@@ -56131,6 +56132,8 @@ local autoAttachTimerInterval = 1000 ---- Timer intervals are in milliseconds
 local autoAttachTimerTicks = 0 ---- variable to count number of times the timer has run
 local autoAttachTimerTickMax = 5000 ---- Set to zero to disable ticks max
 isGameRunning = false
+isRegisteringWorked_1 = false
+isRegisteringWorked_2 = false
 local function autoAttachTimer_tick(timer) ---- Timer tick call back
         ---- Destroy timer if max ticks is reached
 	if autoAttachTimerTickMax &gt; 0 and autoAttachTimerTicks &gt;= autoAttachTimerTickMax then
@@ -56142,6 +56145,8 @@ local function autoAttachTimer_tick(timer) ---- Timer tick call back
     if isGameRunning == true then
 	 if getProcessIDFromProcessName(PROCESS_NAME_DX11) == nil and getProcessIDFromProcessName(PROCESS_NAME_VULCAN) == nil then
         print("Game has been closed. Waiting on new to be started...")
+        isRegisteringWorked_1 = false
+        isRegisteringWorked_2 = false
         isGameRunning = false
      end
     end
@@ -56163,7 +56168,21 @@ local function autoAttachTimer_tick(timer) ---- Timer tick call back
           end
 	  end
     end
-
+    if isRegisteringWorked_2 == false and isGameRunning == true then
+      if isGameRunning == true and isRegisteringWorked_1 == false then
+         print("Auto Activating Console Commands")
+         field_ConsoleCommands.Active = true
+         isRegisteringWorked_1 = true
+      end
+      if field_ConsoleCommands.Active and true or false then
+        if field_CommandListSize.Value ~= "??" and field_CommandListSize.Value ~= "0" then
+           print("Auto Activating Register Commands")
+           --print("commandListSize OK! " .. field_CommandListSize.Value)
+           field_RegisterCommands.Active = true
+           isRegisteringWorked_2 = true
+        end
+      end
+    end
 	autoAttachTimerTicks = autoAttachTimerTicks + 1 ---- Increase ticks
 end
 autoAttachTimer = createTimer(getMainForm()) ---- Create timer with the main form as it's parent
