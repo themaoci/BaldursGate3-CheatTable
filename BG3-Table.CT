@@ -65,16 +65,16 @@ end
 [ENABLE]
 {$LUA}
 
-fixFontColor(getMainForm(), clWhite)
-fixFontColorForRecords(clBlack)
-fixFormColors(clWhite)
-{$ASM}
-[DISABLE]
-{$LUA}
-
 fixFontColor(getMainForm(), clBlack)
 fixFontColorForRecords(clWhite)
 fixFormColors(clBlack)
+{$ASM}
+[DISABLE]
+{$LUA}
+fixFontColor(getMainForm(), clWhite)
+fixFontColorForRecords(clBlack)
+fixFormColors(clWhite)
+
 </AssemblerScript>
         </CheatEntry>
         <CheatEntry>
@@ -1987,6 +1987,7 @@ bg3.exe+21CE3A6: 48 3B DD        - cmp rbx,rbp
         <CheatEntry>
           <ID>347</ID>
           <Description>"Console Commands [2WS] (ENABLE IN MAIN MENU)"</Description>
+          <Options moHideChildren="1"/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript Async="1">[ENABLE]
 aobscanmodule(console,$process,81 E2 FF FF FF 01 3B)
@@ -2130,7 +2131,7 @@ bg3.exe+2F153EC: CC                 - int 3
             </CheatEntry>
             <CheatEntry>
               <ID>104415</ID>
-              <Description>"cmdList"</Description>
+              <Description>"cmdList (will populate after game save is loaded)"</Description>
               <ShowAsHex>1</ShowAsHex>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Array of byte</VariableType>
