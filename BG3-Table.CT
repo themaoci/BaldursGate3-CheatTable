@@ -48655,60 +48655,106 @@ TemplateAddToPlayer(items, 1)
                       <VariableType>Auto Assembler Script</VariableType>
                       <AssemblerScript Async="1">[ENABLE]
 {$lua}
-COMPANION = {}
-COMPANION["shadowheart"] = "3ed74f06-3c60-42dc-83f6-f034cb47c679" -- shadowheart
-COMPANION["gale"] = "ad9af97d-75da-406a-ae13-7071c563f604" -- gale
-COMPANION["minthara"] = "25721313-0c15-4935-8176-9f134385451b" -- minthara
-COMPANION["astarion"] = "c7c13742-bacd-460a-8f65-f864fe41f255" -- astarion
-COMPANION["laezel"] = "58a69333-40bf-8358-1d17-fff240d7fb12" -- lae'zel
-COMPANION["wyll"] = "c774d764-4a17-48dc-b470-32ace9ce447d" -- wyll
-COMPANION["karlach"] = "2c76687d-93a2-477b-8b18-8a14b549304c" -- karlach
+--companionInParty = {}
+-- companionInParty["FLAG_UUID_State_IsInParty"] = {"COMPANION_UUID", "DISPLAY_NAME"}
+--companionInParty["ef789a01-f41e-4a7d-9097-fa9c4f1d0f16"] = {"c7c13742-bacd-460a-8f65-f864fe41f255", "Astarion"}
+--companionInParty["126c47da-7d24-49ce-b06f-5a44f09ee87e"] = {"4888dfaa-2e0a-4c10-9c8a-d5345aeb4746", "DarkUrge"}
+--companionInParty["639d141f-6fa8-4d93-8eb7-41243e0fea32"] = {"ad9af97d-75da-406a-ae13-7071c563f604", "Gale"}
+--companionInParty["9a3ea4cd-3a44-40f7-9d63-2b29bdb28725"] = {"7628bc0e-52b8-42a7-856a-13a6fd413323", "Halsin"}
+--companionInParty["1b86aa78-a2db-4faa-b4a6-c5591c03bac9"] = {"91b6b200-7d00-4d62-8dc9-99e8339dfa1a", "Jaheira"}
+--companionInParty["eb7c4de0-36b7-4086-aa33-82c09596a395"] = {"2c76687d-93a2-477b-8b18-8a14b549304c", "Karlach"}
+--companionInParty["3ee6b1f2-24f4-4e85-b7dc-49060e6d2699"] = {"58a69333-40bf-8358-1d17-fff240d7fb12", "Lae'zel"}
+--companionInParty["aeb58e60-562a-4e20-8cb2-0deb03b010fc"] = {"0de603c5-42e2-4811-9dad-f652de080eba", "Minsc"}
+--companionInParty["766b8981-eb17-3ec5-5d30-2626509c550f"] = {"25721313-0c15-4935-8176-9f134385451b", "Minthara"}
+--companionInParty["9a029c5a-e3c3-45ef-9cd4-1cb45718deb1"] = {"3ed74f06-3c60-42dc-83f6-f034cb47c679", "Shadowheart"}
+--companionInParty["12fecc65-b6f4-4dc3-3832-2f81314fc22d"] = {"c774d764-4a17-48dc-b470-32ace9ce447d"; "Wyll"}
+
+--hireling = {}
+-- hireling["HIRELING_UUID"] = {"CLASS", "DISPLAY_NAME"}
+--hireling["7bed07ee-d1db-498d-bbfd-600ddf04676e"] = {"Barbarian", "Eldra Luthrinn"}
+--hireling["4d3c9cb3-ca34-46ba-9c81-44081270bfde"] = {"Bard", "Brinna Brightsong"}
+--hireling["12e541ac-1eb3-4b8c-a8b8-95263e30b217"] = {"Cleric", "Zenith Feur'sel"}
+--hireling["49f522f8-9ac9-431e-ab39-a45e38e222c2"] = {"Druid", "Danton"}
+--hireling["d61d12ad-dc80-4805-8c6e-fb876da196cd"] = {"Fighter", "Varanna Sunblossom"}
+--hireling["0b149cab-4438-467a-953d-8697535b953d"] = {"Monk", "Sina'zith"}
+--hireling["244e782b-a99c-444a-bd8d-d356c26c2902"] = {"Paladin", "Kerz"}
+--hireling["0488a406-402c-4bd1-ba38-63b28c112d8d"] = {"Ranger", "Ver'yll Wenkiir"}
+--hireling["e4818484-7ee4-466b-82b3-60bbd7b2ff8f"] = {"Rogue", "Maddala Deadeye"}
+--hireling["097aa418-eda5-47f9-867f-29a4339be03e"] = {"Sorcerer","Jacelyn"}
+--hireling["ee3f1f8d-f2d1-43f2-aba0-72cacafce03c"] = {"Warlock", "Kree Derryck"}
+--hireling["2c8c93f0-898b-42d6-b2ca-cf4922852632"] = {"Wizard", "Sir Fuzzalump"}
+
 --[[
 EXAMPLE:
 COMPANIONS[""] = "" --
 ]]
-
+function GetSelectedCompanionsLikelyHood()
+  local al = getAddressList()
+  local companion_table = {}
+  local companion = al.getMemoryRecordByID(104383) --"Astarion"
+  if companion.Active and true or false then
+     table.insert(companion_table, "c7c13742-bacd-460a-8f65-f864fe41f255")
+  end
+  companion = al.getMemoryRecordByID(104390) --"Gale"
+  if companion.Active and true or false then
+     table.insert(companion_table, "ad9af97d-75da-406a-ae13-7071c563f604")
+  end
+  companion = al.getMemoryRecordByID(104389) --"Halsin"
+  if companion.Active and true or false then
+     table.insert(companion_table, "7628bc0e-52b8-42a7-856a-13a6fd413323")
+  end
+  companion = al.getMemoryRecordByID(104388) --"Jaheira"
+  if companion.Active and true or false then
+     table.insert(companion_table, "91b6b200-7d00-4d62-8dc9-99e8339dfa1a")
+  end
+  companion = al.getMemoryRecordByID(104387) --"Karlach"
+  if companion.Active and true or false then
+     table.insert(companion_table, "2c76687d-93a2-477b-8b18-8a14b549304c")
+  end
+  companion = al.getMemoryRecordByID(104386) --"Lae'zel"
+  if companion.Active and true or false then
+     table.insert(companion_table, "58a69333-40bf-8358-1d17-fff240d7fb12")
+  end
+  --companion = al.getMemoryRecordByID(104385) --"Losiir"
+  --if companion.Active and true or false then
+  --   table.insert(companion_table, "")
+  --end
+  companion = al.getMemoryRecordByID(104384) --"Minsc"
+  if companion.Active and true or false then
+     table.insert(companion_table, "0de603c5-42e2-4811-9dad-f652de080eba")
+  end
+  companion = al.getMemoryRecordByID(104391) --"Minthara"
+  if companion.Active and true or false then
+     table.insert(companion_table, "25721313-0c15-4935-8176-9f134385451b")
+  end
+  companion = al.getMemoryRecordByID(104392) --"Shadowheart"
+  if companion.Active and true or false then
+     table.insert(companion_table, "3ed74f06-3c60-42dc-83f6-f034cb47c679")
+  end
+  companion = al.getMemoryRecordByID(104393) --"Wyll"
+  if companion.Active and true or false then
+     table.insert(companion_table, "c774d764-4a17-48dc-b470-32ace9ce447d")
+  end
+  return companion_table
+end
 [DISABLE]
+
+
 </AssemblerScript>
                       <CheatEntries>
                         <CheatEntry>
                           <ID>104395</ID>
-                          <Description>"[DEBUG] Get Selected Character UUID [2WS]"</Description>
-                          <Options moHideChildren="1"/>
+                          <Description>"[DEBUG] Get Selected Character UUID"</Description>
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript Async="1">[ENABLE]
-
-{$asm}
-alloc(m_MainCharacter,0x512)
-registersymbol(m_MainCharacter)
-
-m_MainCharacter:
- dq "empty"
-
 {$lua}
 if syntaxcheck then return end
 
 local variable = GetHostCharacter()
-writeString("m_MainCharacter", tostring(variable))
+print("FOUND: " .. variable)
 
 [DISABLE]
-{$asm}
-unregistersymbol(m_MainCharacter)
-dealloc(m_MainCharacter)
 </AssemblerScript>
-                          <CheatEntries>
-                            <CheatEntry>
-                              <ID>104396</ID>
-                              <Description>"Found Value ===&gt;"</Description>
-                              <ShowAsSigned>0</ShowAsSigned>
-                              <VariableType>String</VariableType>
-                              <Length>36</Length>
-                              <Unicode>0</Unicode>
-                              <CodePage>0</CodePage>
-                              <ZeroTerminate>1</ZeroTerminate>
-                              <Address>m_MainCharacter</Address>
-                            </CheatEntry>
-                          </CheatEntries>
                         </CheatEntry>
                         <CheatEntry>
                           <ID>104397</ID>
@@ -48730,10 +48776,10 @@ dealloc(m_MainCharacter)
 if syntaxcheck then return end
 [ENABLE]
 local companions = GetSelectedCompanionsLikelyHood()
-local characterHost = GetHostCharacter()
 if #companions &gt; 0 then
    for i=1,#companions do
-      SetArgToString(1, characterHost)
+       print(companions[i])
+      SetArgToString(1, GetHostCharacter())
       SetArgToString(0, companions[i])
       SetArgToLong(2, 10)
       ExecuteCall("AddAttitudeTowardsPlayer")
@@ -48752,10 +48798,10 @@ end
 if syntaxcheck then return end
 [ENABLE]
 local companions = GetSelectedCompanionsLikelyHood()
-local characterHost = GetHostCharacter()
 if #companions &gt; 0 then
    for i=1,#companions do
-      SetArgToString(1, characterHost)
+       print(companions[i])
+      SetArgToString(1, GetHostCharacter())
       SetArgToString(0, companions[i])
       SetArgToLong(2, 100)
       ExecuteCall("AddAttitudeTowardsPlayer")
@@ -48779,12 +48825,12 @@ end
 if syntaxcheck then return end
 [ENABLE]
 local companions = GetSelectedCompanionsLikelyHood()
-local characterHost = GetHostCharacter()
 if #companions &gt; 0 then
    for i=1,#companions do
-      SetArgToString(1, characterHost)
+       print(companions[i])
+      SetArgToString(1, GetHostCharacter())
       SetArgToString(0, companions[i])
-      SetArgToLong(2, 10)
+      SetArgToLong(2, -10)
       ExecuteCall("AddAttitudeTowardsPlayer")
    end
 else
@@ -48801,12 +48847,12 @@ end
 if syntaxcheck then return end
 [ENABLE]
 local companions = GetSelectedCompanionsLikelyHood()
-local characterHost = GetHostCharacter()
 if #companions &gt; 0 then
    for i=1,#companions do
-      SetArgToString(1, characterHost)
+       print(companions[i])
+      SetArgToString(1, GetHostCharacter())
       SetArgToString(0, companions[i])
-      SetArgToLong(2, 100)
+      SetArgToLong(2, -100)
       ExecuteCall("AddAttitudeTowardsPlayer")
    end
 else
