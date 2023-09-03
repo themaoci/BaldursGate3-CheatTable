@@ -31474,10 +31474,12 @@ Zone_Thunderwave:Zone_Thunderwave
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript>{$lua}
 if syntaxcheck then return end
-
 [ENABLE]
+local spellString = getAddress("m_spellString")
+spellString = readString(spellString, 255, false)
+print("Adding spell: " .. spellString)
 local spell = {
- m_spellString
+ spellString
 }
 AddSpellToPlayer(spell)
 [DISABLE]
@@ -31490,10 +31492,12 @@ AddSpellToPlayer(spell)
                           <VariableType>Auto Assembler Script</VariableType>
                           <AssemblerScript>{$lua}
 if syntaxcheck then return end
-
 [ENABLE]
+local spellString = getAddress("m_spellString")
+spellString = readString(spellString, 255, false)
+print("Adding spell: " .. spellString)
 local spell = {
- m_spellString
+ spellString
 }
 RemoveSpellFromPlayer(spell)
 [DISABLE]
