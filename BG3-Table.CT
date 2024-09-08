@@ -119,7 +119,7 @@ end
         </CheatEntry>
         <CheatEntry>
           <ID>5538</ID>
-          <Description>"Start Game Initializer"</Description>
+          <Description>"Start Game Initializer (change path in script)"</Description>
           <Options moHideChildren="1" moManualExpandCollapse="1" moAllowManualCollapseAndExpand="1"/>
           <Color>C0C0C0</Color>
           <VariableType>Auto Assembler Script</VariableType>
@@ -2115,7 +2115,7 @@ bg3.exe+21CE3A6: 48 3B DD        - cmp rbx,rbp
           <Color>C0C0C0</Color>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript Async="1">[ENABLE]
-aobscanmodule(console,$process,81 E2 FF FF FF 01 3B)
+aobscanmodule(console,$process,3B ?? 2C 73 ?? 48 8B ?? ?? 48 8B)
 alloc(newmem,$1000,console)
 alloc(cmdCode,$1000)
 alloc(cmdStr0,$1000)
@@ -2129,22 +2129,24 @@ label(cmdArgs)
 label(cmdSelf)
 label(cmdAddr)
 label(cmdList)
-label(code)
+label(consoleBkp)
 label(return)
 
 newmem:
-  mov rax,cmdList
-  mov [rax],rcx
-code:
-  and edx,01FFFFFF
+  push rcx
+  mov rcx,cmdList
+  mov [rcx],rax
+  pop rcx
+consoleBkp:
+  readmem(console+05,8)
   jmp return
 
 cmdList:
   dq 0
 
-console:
+console+05:
   jmp newmem
-  nop
+  nop 3
 return:
 
 cmdCode:
@@ -2180,6 +2182,7 @@ cmdArgs:
   dq 0
 
 registersymbol(console)
+registersymbol(consoleBkp)
 registersymbol(cmdList)
 registersymbol(cmdCall)
 registersymbol(cmdAddr)
@@ -2192,9 +2195,10 @@ registersymbol(cmdStr3)
 registersymbol(cmdStr4)
 
 [DISABLE]
-console:
-  db 81 E2 FF FF FF 01
+console+05:
+  readmem(consoleBkp, 8)
 unregistersymbol(console)
+unregistersymbol(consoleBkp)
 dealloc(newmem)
 
 unregistersymbol(cmdList)
@@ -2210,6 +2214,34 @@ dealloc(cmdStr1)
 dealloc(cmdStr2)
 dealloc(cmdStr3)
 dealloc(cmdStr4)
+
+{
+// ORIGINAL CODE - INJECTION POINT: bg3.exe+2818090
+
+bg3.exe+2818064: 48 33 C4                 - xor rax,rsp
+bg3.exe+2818067: 48 89 84 24 20 01 00 00  - mov [rsp+00000120],rax
+bg3.exe+281806F: 4C 8B 2D 6A 45 31 03     - mov r13,[bg3.exe+5B2C5E0] // &lt;-- console
+bg3.exe+2818076: 4D 8B F0                 - mov r14,r8
+bg3.exe+2818079: C1 EA 03                 - shr edx,03
+bg3.exe+281807C: 81 E2 FF FF FF 01        - and edx,01FFFFFF
+bg3.exe+2818082: 4C 89 6C 24 40           - mov [rsp+40],r13
+bg3.exe+2818087: 49 8B 45 08              - mov rax,[r13+08]
+bg3.exe+281808B: 3B 50 2C                 - cmp edx,[rax+2C]
+bg3.exe+281808E: 73 0A                    - jae bg3.exe+281809A
+// ---------- INJECTING HERE ----------
+bg3.exe+2818090: 48 8B 40 20              - mov rax,[rax+20]
+// ---------- DONE INJECTING  ----------
+bg3.exe+2818094: 48 8B 3C D0              - mov rdi,[rax+rdx*8]
+bg3.exe+2818098: EB 02                    - jmp bg3.exe+281809C
+bg3.exe+281809A: 33 FF                    - xor edi,edi
+bg3.exe+281809C: 48 85 FF                 - test rdi,rdi
+bg3.exe+281809F: 0F 84 7E 02 00 00        - je bg3.exe+2818323
+bg3.exe+28180A5: 48 89 AC 24 68 01 00 00  - mov [rsp+00000168],rbp
+bg3.exe+28180AD: 48 8B D7                 - mov rdx,rdi
+bg3.exe+28180B0: 48 89 B4 24 78 01 00 00  - mov [rsp+00000178],rsi
+bg3.exe+28180B8: 49 8B CD                 - mov rcx,r13
+bg3.exe+28180BB: 4C 89 A4 24 38 01 00 00  - mov [rsp+00000138],r12
+}
 
 {
 // ORIGINAL CODE - INJECTION POINT: bg3.exe+2F153D3
@@ -2294,71 +2326,92 @@ if ConsoleCommands.Active and true or false then
 end
 
 local commands = readPointer("cmdList")
-if commands == 0 then
-  print("plaese load a saved game first")
+if not commands or commands == 0 then
+  print("please load a saved game first")
+  assert(false,"can't activate yet")
   return
 end
 local size = readInteger(commands + 0x2C)
-print("Commands Found: " .. tostring(size))
+
 if size &lt;= 0 then
   print("please load a saved game first")
+  assert(false,"can't activate yet")
   return
 elseif size &gt; 3000 then
   size = 3000 -- just in case
 end
 commands = readPointer(commands + 0x20)
+if not commands or commands == 0 then
+  print("please load a saved game first")
+  assert(false,"can't activate yet")
+  return
+end
 COMMAND_SELF = {}
 for i = 1, size do
   local addr = readPointer(commands)
-  if addr &gt; 0 then
+  if addr and addr ~= 0 then
     local name = readPointer(addr + 0x08)
-    if name &gt; 0 then
+    if name and name ~= 0 then
       name = readString(name, 256, false)
-      local self = readPointer(addr + 0x40)
-      --print(i .. " - " .. name .. " -&gt; " .. tostring(addr))
-      addr = readPointer(addr + 0x48)
-      COMMAND_SELF[name] = self
-      if addr &gt; 0x1000 then
-        unregisterSymbol(name)
-        registerSymbol(name, addr, true)
+      if type(name) == "string" then
+        local self = readPointer(addr + 0x40)
+
+        addr = readPointer(addr + 0x48)
+        COMMAND_SELF[name] = self
+        if addr &gt; 0x1000 then
+          unregisterSymbol(name)
+          registerSymbol(name, addr, true)
+        end
       end
-    else
-     --print(i .. " name address if fucked")
+
+
     end
-  else
-   --print(i .. " addr address if fucked")
+
+
   end
   commands = commands + 0x08
 end
 
 function PrepareCall(name)
-  local cmdAddr = getAddress("cmdAddr")
-  local cmdSelf = getAddress("cmdSelf")
   local cmd = getAddress(name)
-  writePointer(cmdAddr, cmd)
-  writePointer(cmdSelf, COMMAND_SELF[name])
+  if cmd and cmd ~= 0 then
+    local cmdAddr = getAddress("cmdAddr")
+    local cmdSelf = getAddress("cmdSelf")
+
+    writePointer(cmdAddr, cmd)
+    writePointer(cmdSelf, COMMAND_SELF[name])
+  else
+    print("Register Commands failed to find command "..name..". Please reregister.")
+    assert(false, "Command not registered")
+  end
 end
 
 function ExecuteCall(FuncName)
-  local cmdAddr = getAddress("cmdAddr")
-  local cmdSelf = getAddress("cmdSelf")
-  local cmdCall = getAddress("cmdCall")
   local cmd = getAddress(FuncName)
-  if cmdAddr == nil then
-     print("ERROR: cmdAddr is nil")
+  if cmd and cmd ~= 0 then
+    local cmdAddr = getAddress("cmdAddr")
+    local cmdSelf = getAddress("cmdSelf")
+    local cmdCall = getAddress("cmdCall")
+
+
+
+
+
+
+
+
+
+
+
+
+
+    writePointer(cmdAddr, cmd)
+    writePointer(cmdSelf, COMMAND_SELF[FuncName])
+    return executeCodeEx(0, nil, cmdCall)
+  else
+    print("Register Commands failed to find command "..FuncName..". Please reregister.")
+    assert(false, "Command not registered")
   end
-  if cmdSelf == nil then
-     print("ERROR: cmdSelf is nil")
-  end
-  if cmdCall == nil then
-     print("ERROR: cmdCall is nil")
-  end
-  if cmd == nil then
-     print("ERROR: cmd is nil")
-  end
-  writePointer(cmdAddr, cmd)
-  writePointer(cmdSelf, COMMAND_SELF[FuncName])
-  return executeCodeEx(0, nil, cmdCall)
 end
 
 function GetArgAt(i)
@@ -2448,13 +2501,18 @@ function AddPassive(Entity, PassiveID)
     end
   else
     SetArgToString(1, PassiveID)
-    ExecuteCall("AddPassive")
+    return ExecuteCall("AddPassive")
   end
 end
 
 function AddPassiveToPlayer(PassiveID)
   local player = GetHostCharacter()
-  AddPassive(player, PassiveID)
+  return AddPassive(player, PassiveID)
+end
+
+function AddPassiveToWeapon(PassiveID)
+  local item = GetEquippedWeapon()
+  return AddPassive(item, PassiveID)
 end
 
 function RemovePassive(Entity, PassiveID)
@@ -2467,13 +2525,18 @@ function RemovePassive(Entity, PassiveID)
     end
   else
     SetArgToString(1, PassiveID)
-    ExecuteCall("RemovePassive")
+    return ExecuteCall("RemovePassive")
   end
 end
 
 function RemovePassiveFromPlayer(PassiveID)
   local player = GetHostCharacter()
-  RemovePassive(player, PassiveID)
+  return RemovePassive(player, PassiveID)
+end
+
+function RemovePassiveFromWeapon(PassiveID)
+  local item = GetEquippedWeapon()
+  return RemovePassive(item, PassiveID)
 end
 
 function AddBoosts(Object, Boosts, SourceID, Cause)
@@ -2487,13 +2550,13 @@ function AddBoosts(Object, Boosts, SourceID, Cause)
     end
   else
     SetArgToString(1, Boosts)
-    ExecuteCall("AddBoosts")
+    return ExecuteCall("AddBoosts")
   end
 end
 
 function AddBoostsToPlayer(Boosts)
   local player = GetHostCharacter()
-  AddBoosts(player, Boosts, 0, 0)
+  return AddBoosts(player, Boosts, 0, 0)
 end
 
 function RemoveBoosts(Object, Boosts, RemoveOnlyFirstDescMatch, SourceID, Cause)
@@ -2508,13 +2571,13 @@ function RemoveBoosts(Object, Boosts, RemoveOnlyFirstDescMatch, SourceID, Cause)
     end
   else
     SetArgToString(1, Boosts)
-    ExecuteCall("RemoveBoosts")
+    return ExecuteCall("RemoveBoosts")
   end
 end
 
 function RemoveBoostsFromPlayer(Boosts)
   local player = GetHostCharacter()
-  RemoveBoosts(player, Boosts, 0, 0, 0)
+  return RemoveBoosts(player, Boosts, 0, 0, 0)
 end
 
 function ApplyStatus(Object, Status, Duration, Force, Source)
@@ -2532,18 +2595,18 @@ function ApplyStatus(Object, Status, Duration, Force, Source)
     end
   else
     SetArgToString(1, Status)
-    ExecuteCall("ApplyStatus")
+    return ExecuteCall("ApplyStatus")
   end
 end
 
 function ApplyStatusToPlayer(Status, Duration)
   local player = GetHostCharacter()
-  ApplyStatus(player, Status, Duration, 1, 0)
+  return ApplyStatus(player, Status, Duration, 1, 0)
 end
 
 function ApplyStatusToWeapon(Status)
   local item = GetEquippedWeapon()
-  ApplyStatus(item, Status, Duration, 1, 0)
+  return ApplyStatus(item, Status, Duration, 1, 0)
 end
 
 function RemoveStatus(Target, Status, Cause)
@@ -2556,18 +2619,18 @@ function RemoveStatus(Target, Status, Cause)
     end
   else
     SetArgToString(1, Status)
-    ExecuteCall("RemoveStatus")
+    return ExecuteCall("RemoveStatus")
   end
 end
 
 function RemoveStatusFromPlayer(Status)
   local player = GetHostCharacter()
-  RemoveStatus(player, Status, 0)
+  return RemoveStatus(player, Status, 0)
 end
 
 function RemoveStatusFromWeapon(Status)
   local item = GetEquippedWeapon()
-  RemoveStatus(item, Status, 0)
+  return RemoveStatus(item, Status, 0)
 end
 
 function AddSpell(Character, Spell, ShowNotification, AddContainerSpells)
@@ -2581,13 +2644,13 @@ function AddSpell(Character, Spell, ShowNotification, AddContainerSpells)
     end
   else
     SetArgToString(1, Status)
-    ExecuteCall("AddSpell")
+    return ExecuteCall("AddSpell")
   end
 end
 
 function AddSpellToPlayer(Spell)
   local player = GetHostCharacter()
-  AddSpell(player, Spell, 0, 1)
+  return AddSpell(player, Spell, 0, 1)
 end
 
 function RemoveSpell(Character, Spell, RemoveContainerSpells)
@@ -2600,13 +2663,13 @@ function RemoveSpell(Character, Spell, RemoveContainerSpells)
     end
   else
     SetArgToString(1, Status)
-    ExecuteCall("RemoveSpell")
+    return ExecuteCall("RemoveSpell")
   end
 end
 
 function RemoveSpellFromPlayer(Spell)
   local player = GetHostCharacter()
-  RemoveSpell(player, Spell, 0)
+  return RemoveSpell(player, Spell, 0)
 end
 
 function SetTag(Target, Tag)
@@ -2726,25 +2789,25 @@ function TemplateAddTo(ItemTemplate, InventoryHolder, Count, ShowNotification)
   SetArgToLong(2, Count)
   SetArgToLong(3, ShowNotification)
   ExecuteCall("TemplateAddTo")
-  Sleep(5)
+
   if type(ItemTemplate) == "table" then
     for i = 1, #ItemTemplate do
       SetArgToString(0, ItemTemplate[i])
       ExecuteCall("TemplateAddTo")
-      Sleep(5)
+
     end
   else
     SetArgToString(0, ItemTemplate)
-    ExecuteCall("TemplateAddTo")
-    Sleep(5)
-    end
+    return ExecuteCall("TemplateAddTo")
+
+  end
 end
 
 function TemplateAddToPlayer(ItemTemplate, Count)
   local player = GetHostCharacter()
-  Sleep(5)
-  TemplateAddTo(ItemTemplate, player, Count, 1)
-  Sleep(5)
+
+  return TemplateAddTo(ItemTemplate, player, Count, 1)
+
 end
 
 function GetPosition(Target)--: X: Y: Z
@@ -2807,7 +2870,7 @@ function GenerateTreasure(InventoryHolder, TreasureID, Level, Finder)
   SetArgToLong(2, Level)
   SetArgToString(3, Finder)
   ClearArg(4)
-  ExecuteCall("GenerateTreasure")
+  return ExecuteCall("GenerateTreasure")
 end
 
 function GenerateTreasureBag(TreasureID)
@@ -2870,8 +2933,6 @@ function GetEquippedItem(Character, Slotname)--: Item
   ExecuteCall("GetEquippedItem")
   return GetArgAsString(2)
 end
-
-
 
 -- allocate usefull string variables accessable in scripts
 {$asm}
@@ -32235,6 +32296,7 @@ TemplateAddToPlayer("7ee02bb4-79a0-41d5-9f0a-7feae2e6561a", 1)
                         <CheatEntry>
                           <ID>104186</ID>
                           <Description>"Indyviduals"</Description>
+                          <Options moHideChildren="1"/>
                           <Color>C0C0C0</Color>
                           <GroupHeader>1</GroupHeader>
                           <CheatEntries>
@@ -32524,6 +32586,7 @@ TemplateAddToPlayer(item, 10)
                         <CheatEntry>
                           <ID>104185</ID>
                           <Description>"Bags of Treasure"</Description>
+                          <Options moHideChildren="1"/>
                           <Color>C0C0C0</Color>
                           <GroupHeader>1</GroupHeader>
                           <CheatEntries>
@@ -53680,6 +53743,18 @@ end
     </CheatEntry>
     <CheatEntry>
       <ID>4761</ID>
+      <Description>"--------------------------------------------------------"</Description>
+      <Color>008000</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>104426</ID>
+      <Description>"[2WS] -&gt; 2 Way Switch"</Description>
+      <Color>008000</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>104425</ID>
       <Description>"--- Game v4.1.1.3669438+ ---"</Description>
       <Color>008000</Color>
       <GroupHeader>1</GroupHeader>
